@@ -1,7 +1,6 @@
 package me.choicore.samples.operation
 
 import me.choicore.samples.operation.dsl.Timeline
-import java.math.BigDecimal
 
 object MeteringPeriodFactory {
     fun fullest(source: List<MeteringPeriod>): List<MeteringPeriod> {
@@ -14,7 +13,7 @@ object MeteringPeriodFactory {
                 source.forEach { slot(it.range) }
             }.run {
                 this.unset.map {
-                    MeteringPeriod(it, BigDecimal.valueOf(100))
+                    MeteringPeriod.standard(it)
                 }
             }
 

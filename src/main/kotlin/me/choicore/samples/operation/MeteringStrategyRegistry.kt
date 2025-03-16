@@ -7,7 +7,7 @@ data class MeteringStrategyRegistry(
     private val dayOfWeekStrategies: List<MeteringDayOfWeekStrategy>,
     private val specificDateStrategies: List<MeteringSpecificDateStrategy>,
 ) : TimeBasedMeteringStrategy {
-    private val week =
+    private val daysOfWeek =
         dayOfWeekStrategies
             .groupBy { it.dayOfWeek }
             .mapValues { (_, strategies: List<MeteringDayOfWeekStrategy>) ->
@@ -27,7 +27,7 @@ data class MeteringStrategyRegistry(
                 return@computeIfAbsent it
             }
 
-            val applicableStrategies = week[date.dayOfWeek]
+            val applicableStrategies = daysOfWeek[date.dayOfWeek]
             if (applicableStrategies != null) {
                 for (strategy in applicableStrategies) {
                     if (strategy.applies(date)) {

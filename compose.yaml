@@ -1,0 +1,10 @@
+services:
+  mariadb:
+    image: 'mysql:lts'
+    environment:
+      - 'MYSQL_DATABASE=meter'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=user'
+    ports:
+      - '3306:3306'

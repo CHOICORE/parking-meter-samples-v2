@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: parking-meter
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/meter
+    username: user
+    password: secret

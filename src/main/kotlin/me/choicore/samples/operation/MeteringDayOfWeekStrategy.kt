@@ -9,4 +9,6 @@ data class MeteringDayOfWeekStrategy(
     val effectiveDate: LocalDate,
 ) : TimeBasedMeteringStrategy {
     override fun applies(measuredOn: LocalDate): Boolean = measuredOn.dayOfWeek == this.dayOfWeek && measuredOn >= this.effectiveDate
+
+    override fun measure(measurand: Measurand): List<Measurement> = meteringHours.periods.map { period -> period.measure(measurand) }
 }

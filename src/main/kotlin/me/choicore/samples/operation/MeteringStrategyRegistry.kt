@@ -21,6 +21,8 @@ data class MeteringStrategyRegistry(
 
     override fun applies(measuredOn: LocalDate): Boolean = cache[measuredOn] != null
 
+    override fun measure(measurand: Measurand): List<Measurement> = getMeteringStrategy(measurand.date).measure(measurand)
+
     fun getMeteringStrategy(measuredOn: LocalDate): TimeBasedMeteringStrategy {
         return cache.computeIfAbsent(measuredOn) { date ->
             specifies[date]?.let<MeteringSpecificDateStrategy, Nothing> {

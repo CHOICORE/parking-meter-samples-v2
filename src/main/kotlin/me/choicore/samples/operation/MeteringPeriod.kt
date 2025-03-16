@@ -1,17 +1,29 @@
 package me.choicore.samples.operation
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory.getLogger
 import java.math.BigDecimal
+import java.time.Duration
+import java.time.LocalTime
 
 data class MeteringPeriod(
     val range: TimeSlot,
     val rate: BigDecimal,
 ) : Measurer {
-    companion object {
-        val STANDARD = MeteringPeriod(TimeSlot.ALL_DAY, BigDecimal.valueOf(100))
+    override fun measure(measurand: Measurand): Measurement {
+        val (_, from: LocalTime, to: LocalTime) = measurand
+        val intersect: TimeSlot? = range.intersect(startTimeInclusive = from, endTimeExclusive = to)
+
+        if (intersect == null) {
+            log.debug("No intersection between metering period and measurand")
+            return Measurement(measurand = measurand, measurer = this, measurement = Duration.ZERO)
+        }
+
+        return Measurement(measurand = measurand, measurer = this, measurement = intersect.duration)
     }
 
-    override fun measure(measurand: Measurand): Measurement {
-        //    val intersect = range.intersect(startTimeInclusive, endTimeExclusive)
-        TODO()
+    companion object {
+        val log: Logger = getLogger(MeteringPeriod::class.java)
+        val STANDARD: MeteringPeriod = MeteringPeriod(TimeSlot.ALL_DAY, BigDecimal.valueOf(100))
     }
 }

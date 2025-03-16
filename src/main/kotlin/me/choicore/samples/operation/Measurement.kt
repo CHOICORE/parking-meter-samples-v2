@@ -5,5 +5,5 @@ import java.time.Duration
 data class Measurement(
     val measurand: Measurand,
     val measurer: Measurer,
-    val appliedDuration: Duration,
+    val measurement: Duration,
 )

@@ -47,6 +47,6 @@ class Meter(
             }
         }
 
-        TODO()
+        return measurements.toList()
     }
 }

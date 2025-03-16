@@ -1,5 +1,6 @@
 package me.choicore.samples.operation
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit.DAYS
@@ -11,8 +12,8 @@ class Meter(
         startDateTimeInclusive: LocalDateTime,
         endDateTimeExclusive: LocalDateTime,
     ): List<Measurement> {
-        val start = startDateTimeInclusive.toLocalDate()
-        val end = endDateTimeExclusive.toLocalDate()
+        val start: LocalDate = startDateTimeInclusive.toLocalDate()
+        val end: LocalDate = endDateTimeExclusive.toLocalDate()
 
         val measurements: MutableList<Measurement> = mutableListOf()
         when (val between: Long = DAYS.between(start, end)) {
@@ -28,25 +29,60 @@ class Meter(
             }
 
             1L -> {
-                measurements += registry.measure(start, startDateTimeInclusive.toLocalTime(), LocalTime.MIDNIGHT)
-                measurements += registry.measure(end, LocalTime.MIDNIGHT, endDateTimeExclusive.toLocalTime())
+                measurements +=
+                    measure(
+                        measureOn = start,
+                        startTimeInclusive = startDateTimeInclusive.toLocalTime(),
+                        endTimeExclusive = LocalTime.MIDNIGHT,
+                    )
+                measurements +=
+                    measure(
+                        measureOn = end,
+                        startTimeInclusive = LocalTime.MIDNIGHT,
+                        endTimeExclusive = endDateTimeExclusive.toLocalTime(),
+                    )
             }
 
             else -> {
                 measurements +=
-                    registry.measure(
-                        start,
-                        startDateTimeInclusive.toLocalTime(),
-                        endDateTimeExclusive.toLocalTime(),
+                    this.measure(
+                        measureOn = start,
+                        startTimeInclusive = startDateTimeInclusive.toLocalTime(),
+                        endTimeExclusive = endDateTimeExclusive.toLocalTime(),
                     )
                 (1 until between)
                     .forEach {
-                        measurements += registry.measure(start.plusDays(it), LocalTime.MIDNIGHT, LocalTime.MIDNIGHT)
+                        measurements +=
+                            this.measure(
+                                measureOn = start.plusDays(it),
+                                startTimeInclusive = LocalTime.MIDNIGHT,
+                                endTimeExclusive = LocalTime.MIDNIGHT,
+                            )
                     }
-                measurements += registry.measure(end, LocalTime.MIDNIGHT, endDateTimeExclusive.toLocalTime())
+                measurements +=
+                    this.measure(
+                        measureOn = end,
+                        startTimeInclusive = LocalTime.MIDNIGHT,
+                        endTimeExclusive = endDateTimeExclusive.toLocalTime(),
+                    )
             }
         }
 
         return measurements.toList()
     }
+
+    fun measure(measurand: Measurand): List<Measurement> = registry.measure(measurand)
+
+    private fun measure(
+        measureOn: LocalDate,
+        startTimeInclusive: LocalTime,
+        endTimeExclusive: LocalTime,
+    ): List<Measurement> =
+        this.measure(
+            Measurand(
+                date = measureOn,
+                from = startTimeInclusive,
+                to = endTimeExclusive,
+            ),
+        )
 }

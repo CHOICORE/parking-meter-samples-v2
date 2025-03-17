@@ -1,10 +1,8 @@
-package me.choicore.samples.operation
+package me.choicore.samples.operation.domain
 
 data class Measurement(
     val measurand: Measurand,
     val measurer: Measurer,
     val measurement: Long,
-    val factor: Double,
-) {
-    val cost: Long = TODO()
-}
+    val factor: Double = 1.0,
+)

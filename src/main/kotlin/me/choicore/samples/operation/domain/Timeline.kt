@@ -1,10 +1,10 @@
-package me.choicore.samples.operation
+package me.choicore.samples.operation.domain
 
-import me.choicore.samples.operation.dsl.TimelineDsl
+import me.choicore.samples.operation.domain.dsl.TimelineDsl
 import java.time.LocalTime
 
 @Suppress("DataClassPrivateConstructor")
-data class Timeline private constructor(
+internal data class Timeline private constructor(
     val slots: List<TimeSlot>,
 ) {
     private val _unset: MutableList<TimeSlot> = mutableListOf()

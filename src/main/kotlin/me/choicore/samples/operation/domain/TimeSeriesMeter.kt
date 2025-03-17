@@ -1,13 +1,13 @@
-package me.choicore.samples.operation
+package me.choicore.samples.operation.domain
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit.DAYS
 
-class Meter(
+class TimeSeriesMeter(
     private val registry: MeteringStrategyRegistry,
-) {
+) : Meter {
     fun measure(
         startDateTimeInclusive: LocalDateTime,
         endDateTimeExclusive: LocalDateTime,
@@ -19,9 +19,9 @@ class Meter(
         when (val between: Long = DAYS.between(start, end)) {
             0L -> {
                 measurements +=
-                    registry.measure(
+                    this.measure(
                         Measurand(
-                            date = start,
+                            measureOn = start,
                             from = startDateTimeInclusive.toLocalTime(),
                             to = endDateTimeExclusive.toLocalTime(),
                         ),
@@ -30,13 +30,13 @@ class Meter(
 
             1L -> {
                 measurements +=
-                    measure(
+                    this.measure(
                         measureOn = start,
                         startTimeInclusive = startDateTimeInclusive.toLocalTime(),
                         endTimeExclusive = LocalTime.MIDNIGHT,
                     )
                 measurements +=
-                    measure(
+                    this.measure(
                         measureOn = end,
                         startTimeInclusive = LocalTime.MIDNIGHT,
                         endTimeExclusive = endDateTimeExclusive.toLocalTime(),
@@ -71,18 +71,5 @@ class Meter(
         return measurements.toList()
     }
 
-    fun measure(measurand: Measurand): List<Measurement> = registry.measure(measurand)
-
-    private fun measure(
-        measureOn: LocalDate,
-        startTimeInclusive: LocalTime,
-        endTimeExclusive: LocalTime,
-    ): List<Measurement> =
-        this.measure(
-            Measurand(
-                date = measureOn,
-                from = startTimeInclusive,
-                to = endTimeExclusive,
-            ),
-        )
+    override fun measure(measurand: Measurand): List<Measurement> = registry.measure(measurand)
 }

@@ -1,10 +1,10 @@
-package me.choicore.samples.operation
+package me.choicore.samples.operation.domain
 
 import java.time.LocalDate
 import java.time.LocalTime
 
 data class Measurand(
-    val date: LocalDate,
+    val measureOn: LocalDate,
     val from: LocalTime,
     val to: LocalTime,
 )

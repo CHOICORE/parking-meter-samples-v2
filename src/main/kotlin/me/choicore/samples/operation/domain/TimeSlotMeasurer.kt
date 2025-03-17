@@ -1,16 +1,16 @@
-package me.choicore.samples.operation
+package me.choicore.samples.operation.domain
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
 import java.time.LocalTime
 
-data class MeteringPeriod(
-    val range: TimeSlot,
-    val rate: Double,
+data class TimeSlotMeasurer(
+    val timeSlot: TimeSlot,
+    val weight: Double,
 ) : Measurer {
     override fun measure(measurand: Measurand): Measurement {
         val (_, from: LocalTime, to: LocalTime) = measurand
-        val intersect: TimeSlot? = range.intersect(startTimeInclusive = from, endTimeExclusive = to)
+        val intersect: TimeSlot? = timeSlot.intersect(startTimeInclusive = from, endTimeExclusive = to)
 
         if (intersect == null) {
             log.debug("No intersection between metering period and measurand")
@@ -18,7 +18,7 @@ data class MeteringPeriod(
                 measurand = measurand,
                 measurer = this,
                 measurement = 0,
-                factor = this.rate,
+                factor = this.weight,
             )
         }
 
@@ -26,14 +26,14 @@ data class MeteringPeriod(
             measurand = measurand,
             measurer = this,
             measurement = intersect.duration.toMinutes(),
-            factor = this.rate,
+            factor = this.weight,
         )
     }
 
     companion object {
-        val log: Logger = getLogger(MeteringPeriod::class.java)
-        val STANDARD: MeteringPeriod = MeteringPeriod(TimeSlot.ALL_DAY, 1.0)
+        val log: Logger = getLogger(TimeSlotMeasurer::class.java)
+        val STANDARD: TimeSlotMeasurer = TimeSlotMeasurer(TimeSlot.ALL_DAY, 1.0)
 
-        fun standard(range: TimeSlot): MeteringPeriod = MeteringPeriod(range, 1.0)
+        fun standard(timeSlot: TimeSlot): TimeSlotMeasurer = TimeSlotMeasurer(timeSlot, 1.0)
     }
 }

@@ -1,6 +1,6 @@
-package me.choicore.samples.operation
+package me.choicore.samples.operation.domain
 
-import me.choicore.samples.operation.dsl.Timeline
+import me.choicore.samples.operation.domain.dsl.Timeline
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
 import java.time.LocalTime
@@ -18,9 +18,5 @@ class TimelineTests {
                 slot(startTimeInclusive = "23:00", endTimeExclusive = "00:00:00")
             }
         }
-    }
-
-    @Test
-    fun t2() {
     }
 }

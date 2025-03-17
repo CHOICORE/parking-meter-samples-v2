@@ -10,10 +10,7 @@ internal data class Timeline private constructor(
     private val _unset: MutableList<TimeSlot> = mutableListOf()
     val unset: List<TimeSlot> get() = _unset.toList()
 
-    val fulled: Boolean get() = _unset.size == 0
-
     init {
-        println("Timeline created with slots: $slots")
         if (this.slots.isEmpty()) {
             this._unset += TimeSlot.ALL_DAY
         }
@@ -26,8 +23,9 @@ internal data class Timeline private constructor(
             }
             current = slot.endTimeExclusive
         }
-
-        println()
+        if (current != LocalTime.MIDNIGHT) {
+            _unset.add(TimeSlot(current, LocalTime.MIDNIGHT))
+        }
     }
 
     @TimelineDsl

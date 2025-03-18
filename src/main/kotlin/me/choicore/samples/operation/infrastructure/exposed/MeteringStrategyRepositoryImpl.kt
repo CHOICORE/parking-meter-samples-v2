@@ -1,18 +1,13 @@
 package me.choicore.samples.operation.infrastructure.exposed
 
-import me.choicore.samples.operation.domain.DayOfWeekMeteringStrategy
 import me.choicore.samples.operation.domain.MeteringStrategy
+import me.choicore.samples.operation.domain.MeteringStrategy.DayOfWeekMeteringStrategy
+import me.choicore.samples.operation.domain.MeteringStrategy.SpecifiedDateMeteringStrategy
 import me.choicore.samples.operation.domain.MeteringStrategyType.DAY_OF_WEEK
 import me.choicore.samples.operation.domain.MeteringStrategyType.SPECIFIED_DATE
-import me.choicore.samples.operation.domain.SpecifiedDateMeteringStrategy
-import me.choicore.samples.operation.domain.TimeSlotMeter
-import me.choicore.samples.operation.infrastructure.exposed.MeteringStrategyTable.data
-import me.choicore.samples.operation.infrastructure.exposed.MeteringStrategyTable.dayOfWeek
-import me.choicore.samples.operation.infrastructure.exposed.MeteringStrategyTable.effectiveDate
-import me.choicore.samples.operation.infrastructure.exposed.MeteringStrategyTable.registeredAt
-import me.choicore.samples.operation.infrastructure.exposed.MeteringStrategyTable.registeredBy
-import me.choicore.samples.operation.infrastructure.exposed.MeteringStrategyTable.strategyType
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -29,7 +24,7 @@ class MeteringStrategyRepositoryImpl {
                             it[dayOfWeek] = meteringStrategy.dayOfWeek
                             it[strategyType] = DAY_OF_WEEK
                             it[effectiveDate] = meteringStrategy.effectiveDate
-                            it[data] = meteringStrategy.timeSlotMeter.measurers
+                            it[data] = meteringStrategy.timeSlotMeter
                             it[registeredAt] = LocalDateTime.now()
                             it[registeredBy] = "system"
                         }.value
@@ -45,48 +40,26 @@ class MeteringStrategyRepositoryImpl {
                             it[strategyType] = SPECIFIED_DATE
                             it[effectiveDate] = null
                             it[specificDate] = meteringStrategy.specifiedDate
-                            it[data] = meteringStrategy.timeSlotMeter.measurers
+                            it[data] = meteringStrategy.timeSlotMeter
                             it[registeredAt] = LocalDateTime.now()
                             it[registeredBy] = "system"
                         }.value
                 }
             }
 
-            else -> throw RuntimeException("Unsupported metering strategy: $meteringStrategy")
+            else -> {
+                throw RuntimeException("Unsupported metering strategy: $meteringStrategy")
+            }
         }
     }
 
     fun findByLotId(lotId: Long): List<MeteringStrategy> =
         transaction {
             MeteringStrategyTable
-                .select(MeteringStrategyTable.columns)
+                .selectAll()
                 .where {
                     MeteringStrategyTable.lotId eq lotId
-                }.map {
-                    it[MeteringStrategyTable.lotId]
-                    it[dayOfWeek]
-                    it[strategyType]
-                    it[effectiveDate]
-                    it[data]
-                    it[registeredAt]
-                    it[registeredBy]
-                    when (it[strategyType]) {
-                        SPECIFIED_DATE ->
-                            SpecifiedDateMeteringStrategy(
-                                lotId = it[MeteringStrategyTable.lotId],
-                                specifiedDate = it[MeteringStrategyTable.specificDate]!!,
-                                timeSlotMeter = TimeSlotMeter(it[data]),
-                            )
-
-                        DAY_OF_WEEK ->
-                            DayOfWeekMeteringStrategy(
-                                lotId = it[MeteringStrategyTable.lotId],
-                                dayOfWeek = it[dayOfWeek]!!,
-                                timeSlotMeter = TimeSlotMeter(it[data]),
-                                effectiveDate = it[effectiveDate]!!,
-                            )
-                    }
-                }
+                }.map { it.toMeteringStrategy() }
         }
 
     fun getDayOfWeekMeteringStrategies(): List<DayOfWeekMeteringStrategy> {
@@ -95,5 +68,29 @@ class MeteringStrategyRepositoryImpl {
 
     fun getSpecifiedDayMeteringStrategies(): List<SpecifiedDateMeteringStrategy> {
         TODO()
+    }
+
+    private fun ResultRow.toMeteringStrategy(): MeteringStrategy {
+        val lotId = this[MeteringStrategyTable.lotId]
+        val dayOfWeek = this[MeteringStrategyTable.dayOfWeek]
+        val strategyType = this[MeteringStrategyTable.strategyType]
+        val effectiveDate = this[MeteringStrategyTable.effectiveDate]
+        val timeSlotMeter = this[MeteringStrategyTable.data]
+        return when (strategyType) {
+            SPECIFIED_DATE ->
+                SpecifiedDateMeteringStrategy(
+                    lotId = lotId,
+                    specifiedDate = this[MeteringStrategyTable.specificDate]!!,
+                    timeSlotMeter = timeSlotMeter,
+                )
+
+            DAY_OF_WEEK ->
+                DayOfWeekMeteringStrategy(
+                    lotId = lotId,
+                    dayOfWeek = dayOfWeek!!,
+                    timeSlotMeter = timeSlotMeter,
+                    effectiveDate = effectiveDate!!,
+                )
+        }
     }
 }

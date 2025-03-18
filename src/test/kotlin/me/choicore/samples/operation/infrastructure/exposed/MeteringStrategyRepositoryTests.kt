@@ -1,6 +1,6 @@
 package me.choicore.samples.operation.infrastructure.exposed
 
-import me.choicore.samples.operation.domain.DayOfWeekMeteringStrategy
+import me.choicore.samples.operation.domain.MeteringStrategy.DayOfWeekMeteringStrategy
 import me.choicore.samples.operation.domain.TimeSlot
 import me.choicore.samples.operation.domain.TimeSlotMeasurer
 import me.choicore.samples.operation.domain.TimeSlotMeter

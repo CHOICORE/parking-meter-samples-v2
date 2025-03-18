@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import me.choicore.samples.operation.context.ObjectMappers
 import me.choicore.samples.operation.domain.MeteringStrategyType
 import me.choicore.samples.operation.domain.TimeSlotMeasurer
+import me.choicore.samples.operation.domain.TimeSlotMeter
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.json.json
@@ -23,10 +24,17 @@ object MeteringStrategyTable :
         date("specific_date").nullable()
     val dayOfWeek: Column<DayOfWeek?> = enumerationByName("day_of_week", 9, DayOfWeek::class).nullable()
     val effectiveDate: Column<LocalDate?> = date("effective_date").nullable()
-    val data: Column<List<TimeSlotMeasurer>> =
+    val data: Column<TimeSlotMeter> =
         json(
             "data",
-            { obj -> objectMapper.writeValueAsString(obj) },
-            { json -> objectMapper.readValue(json, object : TypeReference<List<TimeSlotMeasurer>>() {}) },
+            { obj -> objectMapper.writeValueAsString(obj.measurers) },
+            { json ->
+                TimeSlotMeter(
+                    objectMapper.readValue(
+                        json,
+                        object : TypeReference<List<TimeSlotMeasurer>>() {},
+                    ),
+                )
+            },
         )
 }

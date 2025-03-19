@@ -1,10 +1,12 @@
 package me.choicore.samples.operation.domain
 
+import me.choicore.samples.operation.domain.dsl.Timeline
+
 class TimeSlotMeter : Meter {
     val measurers: List<TimeSlotMeasurer>
 
     constructor(measurers: List<TimeSlotMeasurer> = emptyList()) {
-        this.measurers = TimeSlotMeasurerFactory.fullest(measurers)
+        this.measurers = TimeSlotMeterResolver.resolve(measurers)
     }
 
     constructor(vararg measurer: TimeSlotMeasurer) : this(measurers = measurer.toList())
@@ -23,4 +25,18 @@ class TimeSlotMeter : Meter {
     override fun hashCode(): Int = measurers.hashCode()
 
     override fun toString(): String = "TimeSlotMeter(measurers=$measurers)"
+
+    private object TimeSlotMeterResolver {
+        fun resolve(source: List<TimeSlotMeasurer>): List<TimeSlotMeasurer> {
+            if (source.isEmpty()) {
+                return listOf(TimeSlotMeasurer.STANDARD)
+            }
+            val additional: List<TimeSlotMeasurer> =
+                Timeline { source.forEach { slot(it.timeSlot) } }
+                    .run { this.unset.map { TimeSlotMeasurer.standard(it) } }
+
+            return (source + additional)
+                .sortedBy { it.timeSlot.startTimeInclusive }
+        }
+    }
 }

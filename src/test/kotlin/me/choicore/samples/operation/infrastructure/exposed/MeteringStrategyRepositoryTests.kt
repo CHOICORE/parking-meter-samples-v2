@@ -1,5 +1,7 @@
 package me.choicore.samples.operation.infrastructure.exposed
 
+import me.choicore.samples.operation.context.entity.ForeignKey
+import me.choicore.samples.operation.context.entity.PrimaryKey
 import me.choicore.samples.operation.domain.MeteringStrategy.DayOfWeekMeteringStrategy
 import me.choicore.samples.operation.domain.TimeSlot
 import me.choicore.samples.operation.domain.TimeSlotMeasurer
@@ -20,7 +22,7 @@ class MeteringStrategyRepositoryTests(
     fun t1() {
         val dayOfWeekMeteringStrategy =
             DayOfWeekMeteringStrategy(
-                lotId = 1,
+                lotId = ForeignKey(1),
                 dayOfWeek = MONDAY,
                 timeSlotMeter =
                     TimeSlotMeter(
@@ -29,13 +31,13 @@ class MeteringStrategyRepositoryTests(
                 effectiveDate = LocalDate.now(),
             )
 
-        val saved: Long = meteringStrategyRepository.save(dayOfWeekMeteringStrategy)
-        assertThat(saved).isGreaterThan(0)
+        val saved: PrimaryKey = meteringStrategyRepository.save(dayOfWeekMeteringStrategy)
+        assertThat(saved.value).isGreaterThan(0)
     }
 
     @Test
     fun t2() {
-        val strategies = meteringStrategyRepository.findByLotId(1)
+        val strategies = meteringStrategyRepository.findByLotId(ForeignKey(1))
         for (strategy in strategies) {
             println(strategy)
         }

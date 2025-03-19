@@ -1,12 +1,11 @@
 package me.choicore.samples.operation.domain
 
+import me.choicore.samples.operation.context.entity.ForeignKey
+import me.choicore.samples.operation.context.entity.PrimaryKey
 import java.time.DayOfWeek
 import java.time.LocalDate
 
 sealed interface MeteringStrategy : Meter {
-    val id: Long
-    val lotId: Long
-
     fun applies(measuredOn: LocalDate): Boolean
 
     sealed interface TimeSlotMeteringStrategy : MeteringStrategy {
@@ -14,16 +13,16 @@ sealed interface MeteringStrategy : Meter {
     }
 
     sealed class AllDayMeteringStrategy(
-        override val id: Long,
-        override val lotId: Long,
+        open val id: PrimaryKey,
+        open val lotId: ForeignKey,
         override val timeSlotMeter: TimeSlotMeter,
     ) : TimeSlotMeteringStrategy {
         override fun measure(measurand: Measurand): List<Measurement> = this.timeSlotMeter.measure(measurand = measurand)
     }
 
     data class SpecifiedDateMeteringStrategy(
-        override val id: Long = 0,
-        override val lotId: Long,
+        override val id: PrimaryKey = PrimaryKey.UNASSIGNED,
+        override val lotId: ForeignKey,
         override val timeSlotMeter: TimeSlotMeter,
         val specifiedDate: LocalDate,
     ) : AllDayMeteringStrategy(id = id, lotId = lotId, timeSlotMeter = timeSlotMeter) {
@@ -31,8 +30,8 @@ sealed interface MeteringStrategy : Meter {
     }
 
     data class DayOfWeekMeteringStrategy(
-        override val id: Long = 0,
-        override val lotId: Long,
+        override val id: PrimaryKey = PrimaryKey.UNASSIGNED,
+        override val lotId: ForeignKey,
         override val timeSlotMeter: TimeSlotMeter,
         val dayOfWeek: DayOfWeek,
         val effectiveDate: LocalDate,

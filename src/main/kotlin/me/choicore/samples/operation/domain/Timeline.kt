@@ -8,7 +8,7 @@ internal data class Timeline private constructor(
     val slots: List<TimeSlot>,
 ) {
     private val _unset: MutableList<TimeSlot> = mutableListOf()
-    val unset: List<TimeSlot> get() = _unset.toList()
+    val unset: List<TimeSlot> get() = this._unset.toList()
 
     init {
         if (this.slots.isEmpty()) {
@@ -17,14 +17,14 @@ internal data class Timeline private constructor(
 
         var current: LocalTime = LocalTime.MIDNIGHT
 
-        slots.forEach { slot ->
+        this.slots.forEach { slot ->
             if (slot.startTimeInclusive > current) {
-                _unset.add(TimeSlot(current, slot.startTimeInclusive))
+                this._unset.add(TimeSlot(current, slot.startTimeInclusive))
             }
             current = slot.endTimeExclusive
         }
         if (current != LocalTime.MIDNIGHT) {
-            _unset.add(TimeSlot(current, LocalTime.MIDNIGHT))
+            this._unset.add(TimeSlot(current, LocalTime.MIDNIGHT))
         }
     }
 
@@ -95,18 +95,18 @@ internal data class Timeline private constructor(
                     var j = 0
 
                     while (i < this.slots.size && j < slots.size) {
-                        val existingSlot = this.slots[i]
-                        val newSlot = slots[j]
+                        val existingTimeSlot: TimeSlot = this.slots[i]
+                        val newTimeSlot: TimeSlot = slots[j]
 
-                        if (existingSlot.overlaps(newSlot)) {
-                            throw IllegalArgumentException("TimeSlot $newSlot overlaps with existing slot $existingSlot")
+                        if (existingTimeSlot.overlaps(newTimeSlot)) {
+                            throw IllegalArgumentException("TimeSlot $newTimeSlot overlaps with existing slot $existingTimeSlot")
                         }
 
-                        if (existingSlot.startTimeInclusive <= newSlot.startTimeInclusive) {
-                            result.add(existingSlot)
+                        if (existingTimeSlot.startTimeInclusive <= newTimeSlot.startTimeInclusive) {
+                            result.add(existingTimeSlot)
                             i++
                         } else {
-                            result.add(newSlot)
+                            result.add(newTimeSlot)
                             j++
                         }
                     }

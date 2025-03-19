@@ -17,12 +17,12 @@ class TimeSlotMeter : Meter {
         if (this === other) return true
         if (other !is TimeSlotMeter) return false
 
-        if (measurers != other.measurers) return false
+        if (this.measurers != other.measurers) return false
 
         return true
     }
 
-    override fun hashCode(): Int = measurers.hashCode()
+    override fun hashCode(): Int = this.measurers.hashCode()
 
     override fun toString(): String = "TimeSlotMeter(measurers=$measurers)"
 

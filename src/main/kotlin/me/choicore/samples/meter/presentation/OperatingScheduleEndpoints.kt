@@ -1,7 +1,9 @@
-package me.choicore.samples.operation.presentation
+package me.choicore.samples.meter.presentation
 
 import me.choicore.samples.context.entity.AuditorContext
-import me.choicore.samples.operation.application.OperatingScheduleManager
+import me.choicore.samples.meter.application.OperatingScheduleManager
+import me.choicore.samples.meter.presentation.request.OperatingScheduleRequest.Modification
+import me.choicore.samples.meter.presentation.request.OperatingScheduleRequest.Registration
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -19,7 +21,7 @@ class OperatingScheduleEndpoints(
     @PostMapping("/{lotId}/schedules")
     fun register(
         @PathVariable lotId: Long,
-        @RequestBody request: OperatingScheduleRequest.Registration,
+        @RequestBody request: Registration,
     ): ResponseEntity<*> {
         AuditorContext(request.registrant) {
             operatingScheduleManager.register(
@@ -37,7 +39,7 @@ class OperatingScheduleEndpoints(
     fun modify(
         @PathVariable lotId: Long,
         @PathVariable scheduleId: Long,
-        @RequestBody request: OperatingScheduleRequest.Modification,
+        @RequestBody request: Modification,
     ): ResponseEntity<*> {
         AuditorContext(request.modifier) {
             operatingScheduleManager.modify(

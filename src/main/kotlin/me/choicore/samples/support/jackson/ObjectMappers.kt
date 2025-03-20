@@ -1,4 +1,4 @@
-package me.choicore.samples.operation.support.jackson
+package me.choicore.samples.support.jackson
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import me.choicore.samples.context.ApplicationContextHolder

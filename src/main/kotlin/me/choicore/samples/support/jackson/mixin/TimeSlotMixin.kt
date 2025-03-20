@@ -1,4 +1,4 @@
-package me.choicore.samples.operation.support.jackson.mixin
+package me.choicore.samples.support.jackson.mixin
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import me.choicore.samples.meter.domain.TimeSlot

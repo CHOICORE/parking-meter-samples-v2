@@ -1,4 +1,4 @@
-package me.choicore.samples.operation.support.exposed
+package me.choicore.samples.support.exposed
 
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.datetime

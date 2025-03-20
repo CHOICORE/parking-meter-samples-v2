@@ -1,12 +1,12 @@
-package me.choicore.samples.meter.infrastructure.exposed.table
+package me.choicore.samples.meter.infrastructure.persistence.exposed.table
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import me.choicore.samples.meter.domain.MeteringStrategyType
 import me.choicore.samples.meter.domain.TimeSlotMeasurer
 import me.choicore.samples.meter.domain.TimeSlotMeter
-import me.choicore.samples.operation.support.exposed.AuditableLongIdTable
-import me.choicore.samples.operation.support.jackson.ObjectMappers
+import me.choicore.samples.support.exposed.AuditableLongIdTable
+import me.choicore.samples.support.jackson.ObjectMappers
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.json.json

@@ -2,6 +2,8 @@ package me.choicore.samples.meter.domain
 
 import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
+import me.choicore.samples.meter.domain.MeteringStrategy.DayOfWeekMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.SpecifiedDateMeteringStrategy
 import me.choicore.samples.meter.domain.MeteringStrategy.TimeSlotMeteringStrategy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -23,10 +25,13 @@ class DelegatingMeteringStrategyRepositoryTests(
         val lotId = ForeignKey(1L)
         val dayOfWeekMeteringStrategyEntity =
             DayOfWeekMeteringStrategyEntity(
-                id = PrimaryKey.UNASSIGNED,
+                id = PrimaryKey.UNINITIALIZED,
                 lotId = lotId,
-                timeSlotMeter = TimeSlotMeter(),
-                effectiveDate = LocalDate.now(),
+                strategy =
+                    DayOfWeekMeteringStrategy(
+                        timeSlotMeter = TimeSlotMeter(),
+                        effectiveDate = LocalDate.now(),
+                    ),
                 registeredAt = LocalDateTime.now(),
                 registeredBy = "test",
             )
@@ -38,10 +43,13 @@ class DelegatingMeteringStrategyRepositoryTests(
 
         val specifiedDateMeteringStrategyEntity =
             SpecifiedDateMeteringStrategyEntity(
-                id = PrimaryKey.UNASSIGNED,
+                id = PrimaryKey.UNINITIALIZED,
                 lotId = lotId,
-                timeSlotMeter = TimeSlotMeter(),
-                specifiedDate = LocalDate.now(),
+                strategy =
+                    SpecifiedDateMeteringStrategy(
+                        timeSlotMeter = TimeSlotMeter(),
+                        specifiedDate = LocalDate.now(),
+                    ),
                 registeredAt = LocalDateTime.now(),
                 registeredBy = "test",
             )

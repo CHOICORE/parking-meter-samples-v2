@@ -1,4 +1,4 @@
-package me.choicore.samples.operation.domain
+package me.choicore.samples.meter.application
 
 enum class RepeatMode {
     REPEAT,

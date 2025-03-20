@@ -1,7 +1,7 @@
 package me.choicore.samples.operation.presentation
 
+import me.choicore.samples.meter.domain.TimeSlot
 import me.choicore.samples.operation.domain.RepeatMode
-import me.choicore.samples.operation.domain.TimeSlot
 import java.time.LocalDate
 import java.time.LocalTime
 

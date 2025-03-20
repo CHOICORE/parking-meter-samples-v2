@@ -1,7 +1,7 @@
 package me.choicore.samples.operation.presentation
 
+import me.choicore.samples.context.entity.AuditorContext
 import me.choicore.samples.operation.application.OperatingScheduleManager
-import me.choicore.samples.operation.context.entity.AuditorContext
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping

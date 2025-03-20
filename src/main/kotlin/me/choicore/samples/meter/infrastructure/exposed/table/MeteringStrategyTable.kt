@@ -1,4 +1,4 @@
-package me.choicore.samples.meter.infrastructure.exposed
+package me.choicore.samples.meter.infrastructure.exposed.table
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,8 +19,8 @@ object MeteringStrategyTable :
         columnName = "strategy_id",
     ) {
     val lotId: Column<Long> = long("lot_id")
-    val strategyType: Column<MeteringStrategyType> = enumerationByName("strategy_type", 13, MeteringStrategyType::class)
-    val specificDate: Column<LocalDate?> = date("specific_date").nullable()
+    val strategyType: Column<MeteringStrategyType> = enumerationByName("strategy_type", 14, MeteringStrategyType::class)
+    val specifiedDate: Column<LocalDate?> = date("specified_date").nullable()
     val dayOfWeek: Column<DayOfWeek?> = enumerationByName("day_of_week", 9, DayOfWeek::class).nullable()
     val effectiveDate: Column<LocalDate?> = date("effective_date").nullable()
     val timeSlotMeter: Column<TimeSlotMeter> =

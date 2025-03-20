@@ -37,8 +37,8 @@ class MeteringStrategyTests {
                 to = LocalTime.of(10, 0),
             )
 
-        val measurements = strategy.measure(measurand)
-        assertThat(measurements).hasSize(1)
-        measurements.forEach(::println)
+        val metrics = strategy.measure(measurand)
+        assertThat(metrics).hasSize(1)
+        metrics.forEach(::println)
     }
 }

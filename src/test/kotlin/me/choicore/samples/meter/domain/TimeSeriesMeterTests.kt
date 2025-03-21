@@ -1,4 +1,4 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime

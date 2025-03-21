@@ -1,7 +1,7 @@
 package me.choicore.samples.operation
 
-import me.choicore.samples.meter.TimeSlotMeasurer
-import me.choicore.samples.meter.TimelineMeter
+import me.choicore.samples.meter.domain.TimeSlotMeasurer
+import me.choicore.samples.meter.domain.TimelineMeter
 import me.choicore.samples.operation.OperatingSchedule.DayOfWeekOperatingSchedule
 import me.choicore.samples.operation.OperatingSchedule.RepeatMode
 import me.choicore.samples.operation.OperatingSchedule.RepeatMode.ONCE

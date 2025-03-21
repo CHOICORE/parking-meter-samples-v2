@@ -2,7 +2,7 @@ package me.choicore.samples.operation
 
 import me.choicore.samples.context.entity.Auditable
 import me.choicore.samples.context.entity.AuditorContext
-import me.choicore.samples.meter.TimelineMeter
+import me.choicore.samples.meter.domain.TimelineMeter
 import me.choicore.samples.operation.OperatingSchedule.RepeatMode.ONCE
 import me.choicore.samples.operation.OperatingSchedule.RepeatMode.REPEAT
 import java.time.DayOfWeek

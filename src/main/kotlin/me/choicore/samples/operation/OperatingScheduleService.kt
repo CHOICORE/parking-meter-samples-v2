@@ -1,6 +1,6 @@
 package me.choicore.samples.operation
 
-import me.choicore.samples.meter.TimeSlotMeasurer
+import me.choicore.samples.meter.domain.TimeSlotMeasurer
 import me.choicore.samples.operation.OperatingSchedule.RepeatMode
 import org.springframework.stereotype.Service
 import java.time.LocalDate

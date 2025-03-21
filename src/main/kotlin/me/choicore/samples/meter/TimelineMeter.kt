@@ -1,6 +1,6 @@
-package me.choicore.samples.operation.meter.domain
+package me.choicore.samples.meter
 
-import me.choicore.samples.operation.meter.domain.dsl.Timeline
+import me.choicore.samples.meter.dsl.Timeline
 
 class TimelineMeter : Meter {
     val measurers: List<TimeSlotMeasurer>
@@ -26,7 +26,7 @@ class TimelineMeter : Meter {
 
     override fun toString(): String = "TimelineMeter(measurers=$measurers)"
 
-    private object TimelineMeterResolver {
+    object TimelineMeterResolver {
         fun resolve(source: List<TimeSlotMeasurer>): List<TimeSlotMeasurer> {
             if (source.isEmpty()) {
                 return listOf(TimeSlotMeasurer.STANDARD)

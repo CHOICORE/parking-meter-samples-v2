@@ -1,6 +1,6 @@
-package me.choicore.samples.operation.meter.domain
+package me.choicore.samples.meter
 
-import me.choicore.samples.operation.meter.domain.dsl.Timeline
+import me.choicore.samples.meter.dsl.Timeline
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
 import java.time.LocalTime

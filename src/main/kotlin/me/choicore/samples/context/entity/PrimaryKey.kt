@@ -7,4 +7,6 @@ value class PrimaryKey(
     companion object {
         val UNINITIALIZED = PrimaryKey(value = 0)
     }
+
+    override fun toString(): String = value.toString()
 }

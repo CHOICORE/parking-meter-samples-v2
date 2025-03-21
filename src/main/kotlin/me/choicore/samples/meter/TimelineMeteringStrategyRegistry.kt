@@ -1,8 +1,8 @@
-package me.choicore.samples.operation.meter.domain
+package me.choicore.samples.meter
 
-import me.choicore.samples.operation.meter.domain.TimelineMeteringStrategy.AbstractTimelineMeteringStrategy
-import me.choicore.samples.operation.meter.domain.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
-import me.choicore.samples.operation.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.TimelineMeteringStrategy.AbstractTimelineMeteringStrategy
+import me.choicore.samples.meter.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
+import me.choicore.samples.meter.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.concurrent.ConcurrentHashMap

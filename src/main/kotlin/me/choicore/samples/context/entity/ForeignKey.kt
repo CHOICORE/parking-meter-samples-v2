@@ -7,4 +7,6 @@ value class ForeignKey(
     init {
         require(value > 0) { "Foreign key requires a strictly positive value" }
     }
+
+    override fun toString(): String = value.toString()
 }

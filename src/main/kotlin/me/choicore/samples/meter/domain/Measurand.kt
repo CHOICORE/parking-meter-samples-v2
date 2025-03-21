@@ -1,4 +1,4 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
 import java.time.LocalDate
 import java.time.LocalTime

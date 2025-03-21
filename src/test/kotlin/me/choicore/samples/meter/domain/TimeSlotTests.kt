@@ -1,4 +1,4 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatNoException

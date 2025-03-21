@@ -1,6 +1,6 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
-import me.choicore.samples.meter.dsl.TimelineDsl
+import me.choicore.samples.meter.domain.dsl.TimelineDsl
 import java.time.LocalTime
 
 class Timeline private constructor(

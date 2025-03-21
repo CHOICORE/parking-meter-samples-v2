@@ -1,8 +1,9 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
-import me.choicore.samples.meter.TimelineMeteringStrategy.AbstractTimelineMeteringStrategy
-import me.choicore.samples.meter.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
-import me.choicore.samples.meter.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringMode.ONCE
+import me.choicore.samples.meter.domain.TimelineMeteringStrategy.AbstractTimelineMeteringStrategy
+import me.choicore.samples.meter.domain.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
+import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.concurrent.ConcurrentHashMap
@@ -26,7 +27,7 @@ data class TimelineMeteringStrategyRegistry(
             }
 
     private val specifies: Map<LocalDate, SpecifiedDateMeteringStrategy> =
-        this.specificDateStrategies.associateBy(SpecifiedDateMeteringStrategy::specifiedDate)
+        this.specificDateStrategies.associateBy(SpecifiedDateMeteringStrategy::effectiveDate)
 
     private val cache = ConcurrentHashMap<LocalDate, TimelineMeteringStrategy?>()
 
@@ -53,6 +54,11 @@ data class TimelineMeteringStrategyRegistry(
     companion object {
         val DEFAULT: TimelineMeteringStrategy =
             object : AbstractTimelineMeteringStrategy() {
+                override val effectiveDate: LocalDate
+                    get() = LocalDate.now()
+                override val meteringMode: MeteringMode
+                    get() = ONCE
+
                 override fun applies(measuredOn: LocalDate): Boolean = true
             }
     }

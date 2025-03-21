@@ -1,6 +1,6 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
-import me.choicore.samples.meter.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

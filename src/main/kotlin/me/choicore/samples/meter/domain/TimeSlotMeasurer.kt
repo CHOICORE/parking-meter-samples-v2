@@ -1,4 +1,4 @@
-package me.choicore.samples.meter
+package me.choicore.samples.meter.domain
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

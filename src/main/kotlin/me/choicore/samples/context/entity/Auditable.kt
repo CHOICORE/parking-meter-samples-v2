@@ -10,5 +10,5 @@ interface Auditable {
     var deletedAt: LocalDateTime?
     var deletedBy: String?
 
-    val deleted get() = deletedAt != null
+    val deleted: Boolean get() = deletedAt != null
 }

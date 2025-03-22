@@ -17,7 +17,7 @@ data class TimelineMeteringStrategyRegistry(
         specificDateStrategies = strategies.filterIsInstance<SpecifiedDateMeteringStrategy>(),
     )
 
-    constructor(vararg strategies: TimelineMeteringStrategy) : this(strategies.toList())
+    constructor(vararg strategy: TimelineMeteringStrategy) : this(strategy.toList())
 
     private val daysOfWeek: Map<DayOfWeek, List<DayOfWeekMeteringStrategy>> =
         this.dayOfWeekStrategies
@@ -32,9 +32,8 @@ data class TimelineMeteringStrategyRegistry(
     private val cache = ConcurrentHashMap<LocalDate, TimelineMeteringStrategy?>()
 
     override fun measure(measurand: Measurand): List<Metric> =
-        getTimelineMeteringStrategy(measuredOn = measurand.measureOn)?.measure(
-            measurand = measurand,
-        ) ?: DEFAULT.measure(measurand)
+        getTimelineMeteringStrategy(measuredOn = measurand.measureOn)?.measure(measurand = measurand)
+            ?: DEFAULT.measure(measurand = measurand)
 
     private fun getTimelineMeteringStrategy(measuredOn: LocalDate): TimelineMeteringStrategy? {
         return this.cache.computeIfAbsent(measuredOn) { date ->

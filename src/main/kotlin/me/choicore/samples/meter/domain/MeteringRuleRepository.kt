@@ -1,14 +1,17 @@
 package me.choicore.samples.meter.domain
 
 import me.choicore.samples.context.entity.ForeignKey
+import me.choicore.samples.context.entity.PrimaryKey
 import java.time.LocalDate
 
-interface TimelineMeteringRuleRepository {
-    fun save(timelineMeteringRule: TimelineMeteringRule): TimelineMeteringRule
+interface MeteringRuleRepository {
+    fun save(meteringRule: MeteringRule): MeteringRule
+
+    fun deleteById(id: PrimaryKey)
 
     fun findBy(
         lotId: ForeignKey,
         effectiveDate: LocalDate,
         vararg meteringMode: MeteringMode,
-    ): List<TimelineMeteringRule>
+    ): List<MeteringRule>
 }

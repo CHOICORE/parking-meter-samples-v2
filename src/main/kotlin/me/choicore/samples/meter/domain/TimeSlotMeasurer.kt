@@ -6,8 +6,10 @@ import java.time.LocalTime
 
 data class TimeSlotMeasurer(
     val timeSlot: TimeSlot,
-    val weight: Double,
+    val calibration: Calibration,
 ) : Measurer {
+    constructor(timeSlot: TimeSlot) : this(timeSlot, Calibration.IDENTITY)
+
     override fun measure(measurand: Measurand): Metric? {
         val (_, from: LocalTime, to: LocalTime) = measurand
         val intersect: TimeSlot? = this.timeSlot.intersect(startTimeInclusive = from, endTimeExclusive = to)
@@ -25,14 +27,14 @@ data class TimeSlotMeasurer(
     }
 
     companion object {
-        private const val FIXED_WEIGHT = 1.0
         val log: Logger = LoggerFactory.getLogger(TimeSlotMeasurer::class.java)
-        val STANDARD: TimeSlotMeasurer = TimeSlotMeasurer(timeSlot = TimeSlot.ALL_DAY, weight = FIXED_WEIGHT)
+        val STANDARD: TimeSlotMeasurer =
+            TimeSlotMeasurer(timeSlot = TimeSlot.ALL_DAY, calibration = Calibration.IDENTITY)
 
         fun standard(timeSlot: TimeSlot): TimeSlotMeasurer =
             TimeSlotMeasurer(
                 timeSlot = timeSlot,
-                weight = FIXED_WEIGHT,
+                calibration = Calibration.IDENTITY,
             )
     }
 }

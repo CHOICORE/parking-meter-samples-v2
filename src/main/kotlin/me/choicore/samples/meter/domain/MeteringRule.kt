@@ -6,7 +6,7 @@ import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
 import java.time.LocalDateTime
 
-data class TimelineMeteringRule(
+data class MeteringRule(
     val id: PrimaryKey = PrimaryKey.UNINITIALIZED,
     val lotId: ForeignKey,
     val timelineMeteringStrategy: TimelineMeteringStrategy,

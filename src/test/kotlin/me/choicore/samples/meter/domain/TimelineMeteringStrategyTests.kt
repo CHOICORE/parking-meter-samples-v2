@@ -13,7 +13,7 @@ class TimelineMeteringStrategyTests {
             TimelineMeter(
                 TimeSlotMeasurer(
                     timeSlot = TimeSlot(LocalTime.of(9, 0), LocalTime.of(10, 0)),
-                    weight = 1.0,
+                    calibration = Calibration.IDENTITY,
                 ),
             )
         val measureOn = LocalDate.of(2025, 3, 20)
@@ -21,7 +21,7 @@ class TimelineMeteringStrategyTests {
         val strategy =
             SpecifiedDateMeteringStrategy(
                 timelineMeter = timelineMeter,
-                specifiedDate = measureOn,
+                effectiveDate = measureOn,
             )
 
         // 지정된 날짜에는 적용되어야 함

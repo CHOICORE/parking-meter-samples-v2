@@ -2,11 +2,13 @@ package me.choicore.samples.meter.domain
 
 import me.choicore.samples.meter.domain.dsl.Timeline
 import org.assertj.core.api.Assertions.assertThatNoException
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.time.LocalTime
 
 class TimelineTests {
     @Test
+    @DisplayName("Timeline DSL test")
     fun t1() {
         assertThatNoException().isThrownBy {
             Timeline {

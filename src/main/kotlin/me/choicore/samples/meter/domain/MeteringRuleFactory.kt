@@ -7,13 +7,13 @@ import me.choicore.samples.meter.domain.TimelineMeteringStrategy.DayOfWeekMeteri
 import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
 import java.time.LocalDate
 
-object TimelineMeteringRuleFactory {
+object MeteringRuleFactory {
     fun create(
         lotId: Long,
         meteringMode: MeteringMode,
         effectiveDate: LocalDate,
         timeSlotMeasurers: List<TimeSlotMeasurer>,
-    ): TimelineMeteringRule {
+    ): MeteringRule {
         val timelineMeter = TimelineMeter(timeSlotMeasurers)
         val timelineMeteringStrategy =
             when (meteringMode) {
@@ -32,7 +32,7 @@ object TimelineMeteringRuleFactory {
                 }
             }
 
-        return TimelineMeteringRule(
+        return MeteringRule(
             lotId = ForeignKey(lotId),
             timelineMeteringStrategy = timelineMeteringStrategy,
         )

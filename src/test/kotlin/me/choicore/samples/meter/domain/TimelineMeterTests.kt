@@ -10,8 +10,8 @@ class TimelineMeterTests {
     fun t1() {
         val timelineMeter =
             TimelineMeter(
-                TimeSlotMeasurer(TimeSlot("00:00", "09:30"), 1.0),
-                TimeSlotMeasurer(TimeSlot("13:00", "15:30"), 1.0),
+                TimeSlotMeasurer(TimeSlot("00:00", "09:30")),
+                TimeSlotMeasurer(TimeSlot("13:00", "15:30")),
             )
         assertThat(timelineMeter.measurers).hasSize(4)
     }

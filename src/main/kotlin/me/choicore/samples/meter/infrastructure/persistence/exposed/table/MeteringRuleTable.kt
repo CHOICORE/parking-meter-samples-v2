@@ -13,9 +13,9 @@ import org.jetbrains.exposed.sql.json.json
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-object TimelineMeteringRuleTable :
+object MeteringRuleTable :
     AuditableLongIdTable(
-        name = "timeline_metering_rule",
+        name = "metering_rule",
         columnName = "rule_id",
     ) {
     val lotId: Column<Long> = long("lot_id")

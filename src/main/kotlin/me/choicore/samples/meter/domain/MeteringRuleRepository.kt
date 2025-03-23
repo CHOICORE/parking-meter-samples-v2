@@ -4,7 +4,7 @@ import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
 import java.time.LocalDate
 
-interface MeteringRuleRepository : MeteringStrategyRegistry {
+interface MeteringRuleRepository : MeteringStrategyProvider {
     fun save(meteringRule: MeteringRule): MeteringRule
 
     fun findBy(

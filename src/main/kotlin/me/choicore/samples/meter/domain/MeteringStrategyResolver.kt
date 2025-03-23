@@ -8,11 +8,11 @@ import java.time.LocalDate
 
 @Component
 class MeteringStrategyResolver(
-    private val meteringStrategyRegistry: MeteringStrategyRegistry,
+    private val meteringStrategyProvider: MeteringStrategyProvider,
 ) {
     fun resolve(measurand: Measurand): MeteringStrategy {
         val meteringStrategy: MeteringStrategy? =
-            this.meteringStrategyRegistry.getAvailableTimeBasedMeteringStrategy(
+            this.meteringStrategyProvider.getAvailableTimeBasedMeteringStrategy(
                 lotId = ForeignKey(measurand.lotId),
                 measureOn = measurand.measureOn,
             )

@@ -14,12 +14,11 @@ import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateB
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategyRegistry
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleEntity
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
-import org.jetbrains.exposed.sql.Exists
+import me.choicore.samples.support.exposed.exists
+import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.DESC
-import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.notExists
@@ -98,21 +97,13 @@ class MeteringRuleRepositoryImpl :
     override fun existsBy(
         lotId: ForeignKey,
         effectiveDate: LocalDate,
-    ): Boolean {
-        val exists: Exists =
-            exists(
-                MeteringRuleTable
-                    .select(intLiteral(1))
-                    .where {
-                        (MeteringRuleTable.lotId eq 1) and
-                            (MeteringRuleTable.effectiveDate eq LocalDate.now()) and
-                            (MeteringRuleTable.meteringMode inList MeteringMode.entries) and
-                            (MeteringRuleTable.deletedAt.isNull())
-                    },
-            )
-        val resultRow: ResultRow = Table.Dual.select(exists).first()
-        return resultRow[exists]
-    }
+    ): Boolean =
+        MeteringRuleTable.exists {
+            (MeteringRuleTable.lotId eq lotId.value) and
+                (MeteringRuleTable.effectiveDate eq effectiveDate) and
+                (MeteringRuleTable.meteringMode inList MeteringMode.entries) and
+                (MeteringRuleTable.deletedAt.isNull())
+        }
 
     @Transactional
     override fun deleteById(id: PrimaryKey) {
@@ -127,7 +118,7 @@ class MeteringRuleRepositoryImpl :
         lotId: ForeignKey,
         measureOn: LocalDate,
     ): TimeBasedMeteringStrategy? {
-        val once =
+        val once: Query =
             MeteringRuleTable
                 .selectAll()
                 .where {
@@ -137,7 +128,7 @@ class MeteringRuleRepositoryImpl :
                         (MeteringRuleTable.deletedAt.isNull())
                 }
 
-        val repeat =
+        val repeat: Query =
             MeteringRuleTable
                 .selectAll()
                 .where {

@@ -1,6 +1,7 @@
 package me.choicore.samples.meter.infrastructure.persistence.exposed.table
 
 import me.choicore.samples.meter.domain.MeteringMode
+import me.choicore.samples.support.exposed.exists
 import org.jetbrains.exposed.sql.Case
 import org.jetbrains.exposed.sql.SortOrder.DESC
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -57,6 +58,19 @@ class MeteringRuleTableTests {
         val single =
             once.unionAll(repeat).singleOrNull()?.let {
             }
+    }
+
+    @Test
+    fun t4() {
+        val exists =
+            MeteringRuleTable.exists {
+                (MeteringRuleTable.lotId eq 1) and
+                    (MeteringRuleTable.effectiveDate eq LocalDate.now().minusMonths(2)) and
+                    (MeteringRuleTable.meteringMode inList MeteringMode.entries) and
+                    (MeteringRuleTable.deletedAt.isNull())
+            }
+
+        println(exists)
     }
 
     @Test

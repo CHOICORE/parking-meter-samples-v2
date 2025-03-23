@@ -8,25 +8,36 @@ import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import me.choicore.samples.meter.domain.MeteringRule
 import me.choicore.samples.meter.domain.MeteringRuleRepository
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategyRegistry
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleEntity
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
+import org.jetbrains.exposed.sql.Exists
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SortOrder.DESC
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.intLiteral
+import org.jetbrains.exposed.sql.notExists
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.unionAll
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Repository
-class MeteringRuleRepositoryImpl : MeteringRuleRepository {
+class MeteringRuleRepositoryImpl :
+    MeteringRuleRepository,
+    TimeBasedMeteringStrategyRegistry {
     @Transactional
     override fun save(meteringRule: MeteringRule): MeteringRule =
-        when (val strategy: TimelineMeteringStrategy = meteringRule.timelineMeteringStrategy) {
-            is DayOfWeekMeteringStrategy -> {
+        when (val strategy: TimeBasedMeteringStrategy = meteringRule.timeBasedMeteringStrategy) {
+            is DayOfWeekBasedMeteringStrategy -> {
                 if (meteringRule.id == PrimaryKey.UNINITIALIZED) {
                     val registered: Long =
                         MeteringRuleTable
@@ -53,7 +64,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
                 }
             }
 
-            is SpecifiedDateMeteringStrategy -> {
+            is SpecifiedDateBasedMeteringStrategy -> {
                 if (meteringRule.id == PrimaryKey.UNINITIALIZED) {
                     val registered: Long =
                         MeteringRuleTable
@@ -83,6 +94,26 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
             }
         }
 
+    @Transactional(readOnly = true)
+    override fun existsBy(
+        lotId: ForeignKey,
+        effectiveDate: LocalDate,
+    ): Boolean {
+        val exists: Exists =
+            exists(
+                MeteringRuleTable
+                    .select(intLiteral(1))
+                    .where {
+                        (MeteringRuleTable.lotId eq 1) and
+                            (MeteringRuleTable.effectiveDate eq LocalDate.now()) and
+                            (MeteringRuleTable.meteringMode inList MeteringMode.entries) and
+                            (MeteringRuleTable.deletedAt.isNull())
+                    },
+            )
+        val resultRow: ResultRow = Table.Dual.select(exists).first()
+        return resultRow[exists]
+    }
+
     @Transactional
     override fun deleteById(id: PrimaryKey) {
         MeteringRuleEntity.findByIdAndUpdate(id.value) {
@@ -92,31 +123,81 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
     }
 
     @Transactional(readOnly = true)
+    override fun getAvailableTimeBasedMeteringStrategy(
+        lotId: ForeignKey,
+        measureOn: LocalDate,
+    ): TimeBasedMeteringStrategy? {
+        val once =
+            MeteringRuleTable
+                .selectAll()
+                .where {
+                    (MeteringRuleTable.lotId eq lotId.value) and
+                        (MeteringRuleTable.effectiveDate eq measureOn) and
+                        (MeteringRuleTable.meteringMode eq ONCE) and
+                        (MeteringRuleTable.deletedAt.isNull())
+                }
+
+        val repeat =
+            MeteringRuleTable
+                .selectAll()
+                .where {
+                    (MeteringRuleTable.lotId eq lotId.value) and
+                        (MeteringRuleTable.effectiveDate lessEq measureOn) and
+                        (MeteringRuleTable.meteringMode eq REPEAT) and
+                        notExists(
+                            MeteringRuleTable
+                                .select(intLiteral(1))
+                                .where {
+                                    (MeteringRuleTable.lotId eq lotId.value) and
+                                        (MeteringRuleTable.effectiveDate eq measureOn) and
+                                        (MeteringRuleTable.meteringMode eq ONCE) and
+                                        (MeteringRuleTable.deletedAt.isNull())
+                                },
+                        )
+                }.orderBy(MeteringRuleTable.effectiveDate, DESC)
+                .limit(1)
+
+        return once.unionAll(repeat).singleOrNull()?.convert()
+    }
+
+    @Transactional(readOnly = true)
     override fun findBy(
         lotId: ForeignKey,
+        meteringMode: MeteringMode,
         effectiveDate: LocalDate,
-        vararg meteringMode: MeteringMode,
     ): List<MeteringRule> =
-        MeteringRuleEntity
-            .find {
-                (MeteringRuleTable.lotId eq lotId.value) and
-                    (MeteringRuleTable.effectiveDate eq effectiveDate) and
-                    (MeteringRuleTable.meteringMode inList meteringMode.toSet()) and
-                    (MeteringRuleTable.deletedAt.isNull())
-            }.map(MeteringRuleEntity::convert)
+        when (meteringMode) {
+            ONCE ->
+                MeteringRuleEntity
+                    .find {
+                        (MeteringRuleTable.lotId eq lotId.value) and
+                            (MeteringRuleTable.effectiveDate lessEq effectiveDate) and
+                            (MeteringRuleTable.meteringMode eq meteringMode) and
+                            MeteringRuleTable.deletedAt.isNull()
+                    }.map(MeteringRuleEntity::convert)
+
+            REPEAT ->
+                MeteringRuleEntity
+                    .find {
+                        (MeteringRuleTable.lotId eq lotId.value) and
+                            (MeteringRuleTable.effectiveDate eq effectiveDate) and
+                            (MeteringRuleTable.meteringMode eq meteringMode) and
+                            MeteringRuleTable.deletedAt.isNull()
+                    }.map(MeteringRuleEntity::convert)
+        }
 
     private fun ResultRow.convert(): MeteringRule {
         val timelineMeteringStrategy =
             when (this[MeteringRuleTable.meteringMode]) {
                 REPEAT -> {
-                    DayOfWeekMeteringStrategy(
+                    DayOfWeekBasedMeteringStrategy(
                         effectiveDate = this[MeteringRuleTable.effectiveDate],
                         timelineMeter = this[MeteringRuleTable.timelineMeter],
                     )
                 }
 
                 ONCE ->
-                    SpecifiedDateMeteringStrategy(
+                    SpecifiedDateBasedMeteringStrategy(
                         effectiveDate = this[MeteringRuleTable.effectiveDate],
                         timelineMeter = this[MeteringRuleTable.timelineMeter],
                     )
@@ -126,7 +207,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
             MeteringRule(
                 id = PrimaryKey(this[MeteringRuleTable.id].value),
                 lotId = ForeignKey(this[MeteringRuleTable.lotId]),
-                timelineMeteringStrategy = timelineMeteringStrategy,
+                timeBasedMeteringStrategy = timelineMeteringStrategy,
                 registeredAt = this[MeteringRuleTable.registeredAt],
                 registeredBy = this[MeteringRuleTable.registeredBy],
             )

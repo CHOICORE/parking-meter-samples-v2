@@ -1,12 +1,12 @@
 package me.choicore.samples.meter.domain
 
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalTime
 
-class TimelineMeteringStrategyTests {
+class TimeBasedMeteringStrategyTests {
     @Test
     fun t1() {
         val timelineMeter =
@@ -19,7 +19,7 @@ class TimelineMeteringStrategyTests {
         val measureOn = LocalDate.of(2025, 3, 20)
 
         val strategy =
-            SpecifiedDateMeteringStrategy(
+            SpecifiedDateBasedMeteringStrategy(
                 timelineMeter = timelineMeter,
                 effectiveDate = measureOn,
             )

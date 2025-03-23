@@ -7,11 +7,16 @@ import java.time.LocalDate
 interface MeteringRuleRepository {
     fun save(meteringRule: MeteringRule): MeteringRule
 
+    fun existsBy(
+        lotId: ForeignKey,
+        effectiveDate: LocalDate,
+    ): Boolean
+
     fun deleteById(id: PrimaryKey)
 
     fun findBy(
         lotId: ForeignKey,
+        meteringMode: MeteringMode,
         effectiveDate: LocalDate,
-        vararg meteringMode: MeteringMode,
     ): List<MeteringRule>
 }

@@ -5,8 +5,8 @@ import me.choicore.samples.context.entity.PrimaryKey
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import me.choicore.samples.meter.domain.MeteringRule
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -32,17 +32,17 @@ class MeteringRuleEntity(
         MeteringRule(
             id = PrimaryKey(this.id.value),
             lotId = ForeignKey(this.lotId),
-            timelineMeteringStrategy =
+            timeBasedMeteringStrategy =
                 when (this.meteringMode) {
                     REPEAT -> {
-                        DayOfWeekMeteringStrategy(
+                        DayOfWeekBasedMeteringStrategy(
                             effectiveDate = this.effectiveDate,
                             timelineMeter = this.timelineMeter,
                         )
                     }
 
                     ONCE ->
-                        SpecifiedDateMeteringStrategy(
+                        SpecifiedDateBasedMeteringStrategy(
                             effectiveDate = this.effectiveDate,
                             timelineMeter = this.timelineMeter,
                         )

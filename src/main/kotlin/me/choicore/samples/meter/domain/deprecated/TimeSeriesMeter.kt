@@ -1,13 +1,17 @@
-package me.choicore.samples.meter.domain
+package me.choicore.samples.meter.domain.deprecated
 
+import me.choicore.samples.meter.domain.Measurand
+import me.choicore.samples.meter.domain.Meter
+import me.choicore.samples.meter.domain.Metric
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.Collections
 
+@Deprecated("unused")
 class TimeSeriesMeter(
-    private val registry: TimelineMeteringStrategyRegistry,
+    private val registry: TimeBasedMeteringStrategyRegistry,
 ) : Meter {
     fun measure(
         startDateTimeInclusive: LocalDateTime,

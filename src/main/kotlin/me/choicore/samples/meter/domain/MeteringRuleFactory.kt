@@ -3,8 +3,8 @@ package me.choicore.samples.meter.domain
 import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.DayOfWeekMeteringStrategy
-import me.choicore.samples.meter.domain.TimelineMeteringStrategy.SpecifiedDateMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
+import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import java.time.LocalDate
 
 object MeteringRuleFactory {
@@ -18,14 +18,14 @@ object MeteringRuleFactory {
         val timelineMeteringStrategy =
             when (meteringMode) {
                 REPEAT -> {
-                    DayOfWeekMeteringStrategy(
+                    DayOfWeekBasedMeteringStrategy(
                         effectiveDate = effectiveDate,
                         timelineMeter = timelineMeter,
                     )
                 }
 
                 ONCE -> {
-                    SpecifiedDateMeteringStrategy(
+                    SpecifiedDateBasedMeteringStrategy(
                         effectiveDate = effectiveDate,
                         timelineMeter = timelineMeter,
                     )
@@ -34,7 +34,7 @@ object MeteringRuleFactory {
 
         return MeteringRule(
             lotId = ForeignKey(lotId),
-            timelineMeteringStrategy = timelineMeteringStrategy,
+            timeBasedMeteringStrategy = timelineMeteringStrategy,
         )
     }
 }

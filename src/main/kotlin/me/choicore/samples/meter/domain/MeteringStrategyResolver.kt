@@ -2,27 +2,27 @@ package me.choicore.samples.meter.domain
 
 import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.AbstractTimeBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.AbstractMeteringStrategy
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-class TimeBasedMeteringStrategyResolver(
-    private val timeBasedMeteringStrategyRegistry: TimeBasedMeteringStrategyRegistry,
+class MeteringStrategyResolver(
+    private val meteringStrategyRegistry: MeteringStrategyRegistry,
 ) {
-    fun resolve(measurand: Measurand): TimeBasedMeteringStrategy {
-        val timeBasedMeteringStrategy: TimeBasedMeteringStrategy? =
-            this.timeBasedMeteringStrategyRegistry.getAvailableTimeBasedMeteringStrategy(
+    fun resolve(measurand: Measurand): MeteringStrategy {
+        val meteringStrategy: MeteringStrategy? =
+            this.meteringStrategyRegistry.getAvailableTimeBasedMeteringStrategy(
                 lotId = ForeignKey(measurand.lotId),
                 measureOn = measurand.measureOn,
             )
 
-        return timeBasedMeteringStrategy ?: DEFAULT
+        return meteringStrategy ?: DEFAULT
     }
 
     companion object {
-        val DEFAULT: TimeBasedMeteringStrategy =
-            object : AbstractTimeBasedMeteringStrategy() {
+        val DEFAULT: MeteringStrategy =
+            object : AbstractMeteringStrategy() {
                 override val effectiveDate: LocalDate
                     get() = LocalDate.now()
                 override val meteringMode: MeteringMode

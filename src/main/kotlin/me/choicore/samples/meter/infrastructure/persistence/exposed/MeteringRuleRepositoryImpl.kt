@@ -8,9 +8,9 @@ import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import me.choicore.samples.meter.domain.MeteringRule
 import me.choicore.samples.meter.domain.MeteringRuleRepository
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.DayOfWeekBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
 import me.choicore.samples.support.exposed.SELECT_ONE
 import me.choicore.samples.support.exposed.exists
@@ -31,7 +31,7 @@ import java.time.LocalDateTime
 class MeteringRuleRepositoryImpl : MeteringRuleRepository {
     @Transactional
     override fun save(meteringRule: MeteringRule): MeteringRule =
-        when (val strategy: TimeBasedMeteringStrategy = meteringRule.timeBasedMeteringStrategy) {
+        when (val strategy: MeteringStrategy = meteringRule.meteringStrategy) {
             is DayOfWeekBasedMeteringStrategy ->
                 if (meteringRule.id == PrimaryKey.UNINITIALIZED) {
                     val registered: Long =
@@ -109,7 +109,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
     override fun getAvailableTimeBasedMeteringStrategy(
         lotId: ForeignKey,
         measureOn: LocalDate,
-    ): TimeBasedMeteringStrategy? {
+    ): MeteringStrategy? {
         val once: Query =
             MeteringRuleTable
                 .selectAll()
@@ -190,7 +190,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
             MeteringRule(
                 id = PrimaryKey(this[MeteringRuleTable.id].value),
                 lotId = ForeignKey(this[MeteringRuleTable.lotId]),
-                timeBasedMeteringStrategy = timelineMeteringStrategy,
+                meteringStrategy = timelineMeteringStrategy,
                 registeredAt = this[MeteringRuleTable.registeredAt],
                 registeredBy = this[MeteringRuleTable.registeredBy],
             )

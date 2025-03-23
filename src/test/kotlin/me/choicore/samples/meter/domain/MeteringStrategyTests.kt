@@ -1,12 +1,12 @@
 package me.choicore.samples.meter.domain
 
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalTime
 
-class TimeBasedMeteringStrategyTests {
+class MeteringStrategyTests {
     @Test
     fun t1() {
         val timelineMeter =

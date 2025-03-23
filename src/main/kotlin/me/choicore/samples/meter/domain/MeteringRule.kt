@@ -9,10 +9,10 @@ import java.time.LocalDateTime
 data class MeteringRule(
     val id: PrimaryKey = PrimaryKey.UNINITIALIZED,
     val lotId: ForeignKey,
-    val timeBasedMeteringStrategy: TimeBasedMeteringStrategy,
+    val meteringStrategy: MeteringStrategy,
     override val registeredAt: LocalDateTime = LocalDateTime.now(),
     override val registeredBy: String = AuditorContext.identifier,
-) : TimeBasedMeteringStrategy by timeBasedMeteringStrategy,
+) : MeteringStrategy by meteringStrategy,
     Auditable {
     override var modifiedAt: LocalDateTime? = null
     override var modifiedBy: String? = null

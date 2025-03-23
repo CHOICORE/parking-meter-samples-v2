@@ -8,8 +8,8 @@ import me.choicore.samples.meter.domain.MeteringMode
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import me.choicore.samples.meter.domain.MeteringRule
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.DayOfWeekBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import me.choicore.samples.meter.domain.TimeSlotMeasurer
 import me.choicore.samples.meter.domain.TimelineMeter
 import me.choicore.samples.support.exposed.AuditableLongIdTable
@@ -76,7 +76,7 @@ object MeteringRuleTable :
             MeteringRule(
                 id = PrimaryKey(this.id.value),
                 lotId = ForeignKey(this.lotId),
-                timeBasedMeteringStrategy =
+                meteringStrategy =
                     when (this.meteringMode) {
                         REPEAT -> {
                             DayOfWeekBasedMeteringStrategy(

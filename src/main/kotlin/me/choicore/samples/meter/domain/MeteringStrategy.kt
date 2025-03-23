@@ -5,23 +5,23 @@ import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-sealed interface TimeBasedMeteringStrategy : Meter {
+sealed interface MeteringStrategy : Meter {
     val timelineMeter: TimelineMeter
     val effectiveDate: LocalDate
     val meteringMode: MeteringMode
 
     fun applies(measuredOn: LocalDate): Boolean
 
-    abstract class AbstractTimeBasedMeteringStrategy(
+    abstract class AbstractMeteringStrategy(
         override val timelineMeter: TimelineMeter = TimelineMeter.STANDARD,
-    ) : TimeBasedMeteringStrategy {
+    ) : MeteringStrategy {
         override fun measure(measurand: Measurand): List<Metric> = this.timelineMeter.measure(measurand = measurand)
     }
 
     data class SpecifiedDateBasedMeteringStrategy(
         override val timelineMeter: TimelineMeter,
         override val effectiveDate: LocalDate,
-    ) : AbstractTimeBasedMeteringStrategy(timelineMeter = timelineMeter) {
+    ) : AbstractMeteringStrategy(timelineMeter = timelineMeter) {
         override val meteringMode: MeteringMode = ONCE
 
         override fun applies(measuredOn: LocalDate): Boolean = measuredOn == this.effectiveDate
@@ -30,7 +30,7 @@ sealed interface TimeBasedMeteringStrategy : Meter {
     data class DayOfWeekBasedMeteringStrategy(
         override val timelineMeter: TimelineMeter,
         override val effectiveDate: LocalDate,
-    ) : AbstractTimeBasedMeteringStrategy(timelineMeter = timelineMeter) {
+    ) : AbstractMeteringStrategy(timelineMeter = timelineMeter) {
         override val meteringMode: MeteringMode = REPEAT
         val dayOfWeek: DayOfWeek = effectiveDate.dayOfWeek
 

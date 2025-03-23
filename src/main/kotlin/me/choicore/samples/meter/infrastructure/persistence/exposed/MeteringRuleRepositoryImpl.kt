@@ -12,7 +12,6 @@ import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategyRegistry
-import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleEntity
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
 import me.choicore.samples.support.exposed.exists
 import org.jetbrains.exposed.sql.Query
@@ -52,7 +51,7 @@ class MeteringRuleRepositoryImpl :
 
                     meteringRule.copy(id = PrimaryKey(value = registered))
                 } else {
-                    MeteringRuleEntity.findByIdAndUpdate(meteringRule.id.value) {
+                    MeteringRuleTable.Entity.findByIdAndUpdate(meteringRule.id.value) {
                         it.effectiveDate = strategy.effectiveDate
                         it.dayOfWeek = strategy.dayOfWeek
                         it.timelineMeter = strategy.timelineMeter
@@ -78,7 +77,7 @@ class MeteringRuleRepositoryImpl :
 
                     meteringRule.copy(id = PrimaryKey(value = registered))
                 } else {
-                    MeteringRuleEntity.findByIdAndUpdate(meteringRule.id.value) {
+                    MeteringRuleTable.Entity.findByIdAndUpdate(meteringRule.id.value) {
                         it.timelineMeter = strategy.timelineMeter
                         it.effectiveDate = strategy.effectiveDate
                         it.lastModifiedAt = meteringRule.modifiedAt
@@ -107,7 +106,7 @@ class MeteringRuleRepositoryImpl :
 
     @Transactional
     override fun deleteById(id: PrimaryKey) {
-        MeteringRuleEntity.findByIdAndUpdate(id.value) {
+        MeteringRuleTable.Entity.findByIdAndUpdate(id.value) {
             it.deletedAt = LocalDateTime.now()
             it.deletedBy = AuditorContext.identifier
         }
@@ -159,22 +158,22 @@ class MeteringRuleRepositoryImpl :
     ): List<MeteringRule> =
         when (meteringMode) {
             ONCE ->
-                MeteringRuleEntity
+                MeteringRuleTable.Entity
                     .find {
                         (MeteringRuleTable.lotId eq lotId.value) and
                             (MeteringRuleTable.effectiveDate lessEq effectiveDate) and
                             (MeteringRuleTable.meteringMode eq meteringMode) and
                             MeteringRuleTable.deletedAt.isNull()
-                    }.map(MeteringRuleEntity::convert)
+                    }.map(MeteringRuleTable.Entity::convert)
 
             REPEAT ->
-                MeteringRuleEntity
+                MeteringRuleTable.Entity
                     .find {
                         (MeteringRuleTable.lotId eq lotId.value) and
                             (MeteringRuleTable.effectiveDate eq effectiveDate) and
                             (MeteringRuleTable.meteringMode eq meteringMode) and
                             MeteringRuleTable.deletedAt.isNull()
-                    }.map(MeteringRuleEntity::convert)
+                    }.map(MeteringRuleTable.Entity::convert)
         }
 
     private fun ResultRow.convert(): MeteringRule {

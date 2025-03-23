@@ -1,7 +1,7 @@
 package me.choicore.samples.meter.domain
 
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
-import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleEntity
+import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -82,7 +82,7 @@ class MeteringRuleServiceTests(
             )
         meteringRuleService.unregister(id = registered)
         transaction {
-            val single = MeteringRuleEntity.find { MeteringRuleEntity.table.id eq registered }.single()
+            val single = MeteringRuleTable.Entity.find { MeteringRuleTable.id eq registered }.single()
             println(single)
         }
     }

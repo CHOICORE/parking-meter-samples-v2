@@ -7,12 +7,14 @@ interface Meter {
     fun measure(measurand: Measurand): List<Metric>
 
     fun measure(
+        lotId: Long,
         measureOn: LocalDate,
         startTimeInclusive: LocalTime,
         endTimeExclusive: LocalTime,
     ): List<Metric> =
         this.measure(
             Measurand(
+                lotId = lotId,
                 measureOn = measureOn,
                 from = startTimeInclusive,
                 to = endTimeExclusive,

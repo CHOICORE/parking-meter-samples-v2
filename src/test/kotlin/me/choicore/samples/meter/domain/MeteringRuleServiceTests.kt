@@ -2,7 +2,7 @@ package me.choicore.samples.meter.domain
 
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
-import org.jetbrains.exposed.sql.transactions.transaction
+import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable.Entity
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -10,12 +10,14 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.context.TestConstructor.AutowireMode.ALL
+import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
 @SpringBootTest
 @TestConstructor(autowireMode = ALL)
+@Transactional
 class MeteringRuleServiceTests(
     private val meteringRuleService: MeteringRuleService,
 ) {
@@ -81,9 +83,7 @@ class MeteringRuleServiceTests(
                     ),
             )
         meteringRuleService.unregister(id = registered)
-        transaction {
-            val single = MeteringRuleTable.Entity.find { MeteringRuleTable.id eq registered }.single()
-            println(single)
-        }
+        val entity: Entity = Entity.find { MeteringRuleTable.id eq registered }.single()
+        println(entity)
     }
 }

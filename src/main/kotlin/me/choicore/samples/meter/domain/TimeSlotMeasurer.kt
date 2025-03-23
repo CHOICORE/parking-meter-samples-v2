@@ -6,16 +6,16 @@ import java.time.LocalTime
 
 data class TimeSlotMeasurer(
     val timeSlot: TimeSlot,
-    val calibration: Calibration,
+    override val calibration: Calibration,
 ) : Measurer {
     constructor(timeSlot: TimeSlot) : this(timeSlot, Calibration.IDENTITY)
 
     override fun measure(measurand: Measurand): Metric? {
-        val (_, from: LocalTime, to: LocalTime) = measurand
+        val (lotId: Long, _, from: LocalTime, to: LocalTime) = measurand
         val intersect: TimeSlot? = this.timeSlot.intersect(startTimeInclusive = from, endTimeExclusive = to)
 
         if (intersect == null) {
-            log.debug("No intersection between metering period and measurand")
+            log.debug("No intersection between metering period and measurand: {}", lotId)
             return null
         }
 

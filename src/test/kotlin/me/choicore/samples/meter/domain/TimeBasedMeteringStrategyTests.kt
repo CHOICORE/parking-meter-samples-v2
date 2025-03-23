@@ -33,6 +33,7 @@ class TimeBasedMeteringStrategyTests {
 
         val measurand =
             Measurand(
+                lotId = 1L,
                 measureOn = measureOn,
                 from = LocalTime.of(9, 0),
                 to = LocalTime.of(10, 0),

@@ -1,19 +1,18 @@
-package me.choicore.samples.meter.domain.deprecated
+package me.choicore.samples.meter.domain
 
-import me.choicore.samples.meter.domain.Measurand
-import me.choicore.samples.meter.domain.Meter
-import me.choicore.samples.meter.domain.Metric
+import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.Collections
 
-@Deprecated("unused")
+@Service
 class TimeSeriesMeter(
-    private val registry: TimeBasedMeteringStrategyRegistry,
+    private val timeBasedMeteringStrategyResolver: TimeBasedMeteringStrategyResolver,
 ) : Meter {
     fun measure(
+        lotId: Long,
         startDateTimeInclusive: LocalDateTime,
         endDateTimeExclusive: LocalDateTime,
     ): List<Metric> {
@@ -25,23 +24,24 @@ class TimeSeriesMeter(
             0L -> {
                 metrics +=
                     this.measure(
-                        Measurand(
-                            measureOn = start,
-                            from = startDateTimeInclusive.toLocalTime(),
-                            to = endDateTimeExclusive.toLocalTime(),
-                        ),
+                        lotId = lotId,
+                        measureOn = start,
+                        startTimeInclusive = startDateTimeInclusive.toLocalTime(),
+                        endTimeExclusive = startDateTimeInclusive.toLocalTime(),
                     )
             }
 
             1L -> {
                 metrics +=
                     this.measure(
+                        lotId = lotId,
                         measureOn = start,
                         startTimeInclusive = startDateTimeInclusive.toLocalTime(),
                         endTimeExclusive = LocalTime.MIDNIGHT,
                     )
                 metrics +=
                     this.measure(
+                        lotId = lotId,
                         measureOn = end,
                         startTimeInclusive = LocalTime.MIDNIGHT,
                         endTimeExclusive = endDateTimeExclusive.toLocalTime(),
@@ -51,6 +51,7 @@ class TimeSeriesMeter(
             else -> {
                 metrics +=
                     this.measure(
+                        lotId = lotId,
                         measureOn = start,
                         startTimeInclusive = startDateTimeInclusive.toLocalTime(),
                         endTimeExclusive = LocalTime.MIDNIGHT,
@@ -59,6 +60,7 @@ class TimeSeriesMeter(
                     .forEach {
                         metrics +=
                             this.measure(
+                                lotId = lotId,
                                 measureOn = start.plusDays(it),
                                 startTimeInclusive = LocalTime.MIDNIGHT,
                                 endTimeExclusive = LocalTime.MIDNIGHT,
@@ -66,6 +68,7 @@ class TimeSeriesMeter(
                     }
                 metrics +=
                     this.measure(
+                        lotId = lotId,
                         measureOn = end,
                         startTimeInclusive = LocalTime.MIDNIGHT,
                         endTimeExclusive = endDateTimeExclusive.toLocalTime(),
@@ -76,5 +79,5 @@ class TimeSeriesMeter(
         return Collections.unmodifiableList(metrics)
     }
 
-    override fun measure(measurand: Measurand): List<Metric> = registry.measure(measurand)
+    override fun measure(measurand: Measurand): List<Metric> = timeBasedMeteringStrategyResolver.resolve(measurand).measure(measurand)
 }

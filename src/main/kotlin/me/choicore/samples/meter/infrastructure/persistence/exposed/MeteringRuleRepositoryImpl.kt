@@ -11,15 +11,14 @@ import me.choicore.samples.meter.domain.MeteringRuleRepository
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.DayOfWeekBasedMeteringStrategy
 import me.choicore.samples.meter.domain.TimeBasedMeteringStrategy.SpecifiedDateBasedMeteringStrategy
-import me.choicore.samples.meter.domain.TimeBasedMeteringStrategyRegistry
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
+import me.choicore.samples.support.exposed.SELECT_ONE
 import me.choicore.samples.support.exposed.exists
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder.DESC
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.intLiteral
 import org.jetbrains.exposed.sql.notExists
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.unionAll
@@ -29,13 +28,11 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Repository
-class MeteringRuleRepositoryImpl :
-    MeteringRuleRepository,
-    TimeBasedMeteringStrategyRegistry {
+class MeteringRuleRepositoryImpl : MeteringRuleRepository {
     @Transactional
     override fun save(meteringRule: MeteringRule): MeteringRule =
         when (val strategy: TimeBasedMeteringStrategy = meteringRule.timeBasedMeteringStrategy) {
-            is DayOfWeekBasedMeteringStrategy -> {
+            is DayOfWeekBasedMeteringStrategy ->
                 if (meteringRule.id == PrimaryKey.UNINITIALIZED) {
                     val registered: Long =
                         MeteringRuleTable
@@ -60,9 +57,8 @@ class MeteringRuleRepositoryImpl :
                     }
                     meteringRule
                 }
-            }
 
-            is SpecifiedDateBasedMeteringStrategy -> {
+            is SpecifiedDateBasedMeteringStrategy ->
                 if (meteringRule.id == PrimaryKey.UNINITIALIZED) {
                     val registered: Long =
                         MeteringRuleTable
@@ -85,11 +81,8 @@ class MeteringRuleRepositoryImpl :
                     }
                     meteringRule
                 }
-            }
 
-            else -> {
-                throw UnsupportedOperationException("Unsupported timeline metering strategy")
-            }
+            else -> throw UnsupportedOperationException("Unsupported timeline metering strategy")
         }
 
     @Transactional(readOnly = true)
@@ -136,7 +129,7 @@ class MeteringRuleRepositoryImpl :
                         (MeteringRuleTable.meteringMode eq REPEAT) and
                         notExists(
                             MeteringRuleTable
-                                .select(intLiteral(1))
+                                .select(SELECT_ONE)
                                 .where {
                                     (MeteringRuleTable.lotId eq lotId.value) and
                                         (MeteringRuleTable.effectiveDate eq measureOn) and

@@ -22,14 +22,17 @@ import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.json.json
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 object MeteringRuleTable :
     AuditableLongIdTable(
         name = "metering_rule",
         columnName = "rule_id",
     ) {
+    private val objectMapper: ObjectMapper = ObjectMappers.getInstance()
+
     val lotId: Column<Long> = long("lot_id")
-    val meteringMode: Column<MeteringMode> = enumerationByName("mode", 14, MeteringMode::class)
+    val meteringMode: Column<MeteringMode> = enumerationByName("metering_mode", 14, MeteringMode::class)
     val dayOfWeek: Column<DayOfWeek?> = enumerationByName("day_of_week", 9, DayOfWeek::class).nullable()
     val effectiveDate: Column<LocalDate> = date("effective_date")
     val timelineMeter: Column<TimelineMeter> =
@@ -48,10 +51,8 @@ object MeteringRuleTable :
             },
         )
 
-    private val objectMapper: ObjectMapper = ObjectMappers.getInstance()
-
     init {
-        uniqueIndex(lotId, effectiveDate, meteringMode, deletedAt)
+        uniqueIndex(this.lotId, this.effectiveDate, this.meteringMode, this.deletedAt)
     }
 
     class Entity(
@@ -59,17 +60,17 @@ object MeteringRuleTable :
     ) : LongEntity(id = id) {
         companion object : LongEntityClass<Entity>(MeteringRuleTable)
 
-        val lotId by MeteringRuleTable.lotId
-        val meteringMode by MeteringRuleTable.meteringMode
-        var effectiveDate by MeteringRuleTable.effectiveDate
-        var dayOfWeek by MeteringRuleTable.dayOfWeek
-        var timelineMeter by MeteringRuleTable.timelineMeter
-        val registeredAt by MeteringRuleTable.registeredAt
-        val registeredBy by MeteringRuleTable.registeredBy
-        var lastModifiedAt by MeteringRuleTable.lastModifiedAt
-        var lastModifiedBy by MeteringRuleTable.lastModifiedBy
-        var deletedAt by MeteringRuleTable.deletedAt
-        var deletedBy by MeteringRuleTable.deletedBy
+        val lotId: Long by MeteringRuleTable.lotId
+        val meteringMode: MeteringMode by MeteringRuleTable.meteringMode
+        var effectiveDate: LocalDate by MeteringRuleTable.effectiveDate
+        var dayOfWeek: DayOfWeek? by MeteringRuleTable.dayOfWeek
+        var timelineMeter: TimelineMeter by MeteringRuleTable.timelineMeter
+        val registeredAt: LocalDateTime by MeteringRuleTable.registeredAt
+        val registeredBy: String by MeteringRuleTable.registeredBy
+        var lastModifiedAt: LocalDateTime? by MeteringRuleTable.lastModifiedAt
+        var lastModifiedBy: String? by MeteringRuleTable.lastModifiedBy
+        var deletedAt: LocalDateTime? by MeteringRuleTable.deletedAt
+        var deletedBy: String? by MeteringRuleTable.deletedBy
 
         fun convert(): MeteringRule =
             MeteringRule(

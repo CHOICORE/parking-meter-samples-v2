@@ -4,8 +4,14 @@ import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
 import java.time.LocalDate
 
-interface MeteringRuleRepository {
+interface MeteringRuleRepository : TimeBasedMeteringStrategyRegistry {
     fun save(meteringRule: MeteringRule): MeteringRule
+
+    fun findBy(
+        lotId: ForeignKey,
+        meteringMode: MeteringMode,
+        effectiveDate: LocalDate,
+    ): List<MeteringRule>
 
     fun existsBy(
         lotId: ForeignKey,
@@ -13,10 +19,4 @@ interface MeteringRuleRepository {
     ): Boolean
 
     fun deleteById(id: PrimaryKey)
-
-    fun findBy(
-        lotId: ForeignKey,
-        meteringMode: MeteringMode,
-        effectiveDate: LocalDate,
-    ): List<MeteringRule>
 }

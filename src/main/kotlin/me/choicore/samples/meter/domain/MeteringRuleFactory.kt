@@ -1,6 +1,6 @@
 package me.choicore.samples.meter.domain
 
-import me.choicore.samples.context.entity.ForeignKey
+import me.choicore.samples.context.entity.SecondaryKey
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
 import me.choicore.samples.meter.domain.MeteringStrategy.DayOfWeekBasedMeteringStrategy
@@ -33,7 +33,7 @@ object MeteringRuleFactory {
             }
 
         return MeteringRule(
-            lotId = ForeignKey(lotId),
+            lotId = SecondaryKey(lotId),
             meteringStrategy = timelineMeteringStrategy,
         )
     }

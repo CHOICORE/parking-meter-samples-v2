@@ -2,8 +2,8 @@ package me.choicore.samples.meter.infrastructure.persistence.exposed.table
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
+import me.choicore.samples.context.entity.SecondaryKey
 import me.choicore.samples.meter.domain.MeteringMode
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
@@ -75,7 +75,7 @@ object MeteringRuleTable :
         fun convert(): MeteringRule =
             MeteringRule(
                 id = PrimaryKey(this.id.value),
-                lotId = ForeignKey(this.lotId),
+                lotId = SecondaryKey(this.lotId),
                 meteringStrategy =
                     when (this.meteringMode) {
                         REPEAT -> {

@@ -1,5 +1,5 @@
 services:
-  mariadb:
+  mysql:
     image: 'mysql:lts'
     environment:
       - 'MYSQL_DATABASE=meter'
@@ -8,3 +8,8 @@ services:
       - 'MYSQL_USER=user'
     ports:
       - '3306:3306'
+
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '6379:6379'

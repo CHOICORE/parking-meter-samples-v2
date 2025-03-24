@@ -1,7 +1,7 @@
 package me.choicore.samples.context.entity
 
 @JvmInline
-value class ForeignKey(
+value class SecondaryKey(
     val value: Long,
 ) {
     init {

@@ -2,14 +2,16 @@ package me.choicore.samples.meter.domain
 
 import me.choicore.samples.meter.domain.dsl.Timeline
 
-class TimelineMeter : Meter {
+class TimelineMeter(
+    measurers: List<TimeSlotMeasurer> = emptyList(),
+) : Meter {
     val measurers: List<TimeSlotMeasurer>
 
-    constructor(measurers: List<TimeSlotMeasurer> = emptyList()) {
+    constructor(vararg measurer: TimeSlotMeasurer) : this(measurers = measurer.toList())
+
+    init {
         this.measurers = TimelineMeterResolver.resolve(measurers)
     }
-
-    constructor(vararg measurer: TimeSlotMeasurer) : this(measurers = measurer.toList())
 
     override fun measure(measurand: Measurand): List<Metric> = this.measurers.mapNotNull { it.measure(measurand) }
 

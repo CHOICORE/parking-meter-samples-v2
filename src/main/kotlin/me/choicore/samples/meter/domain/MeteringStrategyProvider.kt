@@ -1,11 +1,11 @@
 package me.choicore.samples.meter.domain
 
-import me.choicore.samples.context.entity.ForeignKey
+import me.choicore.samples.context.entity.SecondaryKey
 import java.time.LocalDate
 
 interface MeteringStrategyProvider {
     fun getAvailableTimeBasedMeteringStrategy(
-        lotId: ForeignKey,
+        lotId: SecondaryKey,
         measureOn: LocalDate,
     ): MeteringStrategy?
 }

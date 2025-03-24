@@ -1,20 +1,20 @@
 package me.choicore.samples.meter.domain
 
-import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
+import me.choicore.samples.context.entity.SecondaryKey
 import java.time.LocalDate
 
 interface MeteringRuleRepository : MeteringStrategyProvider {
     fun save(meteringRule: MeteringRule): MeteringRule
 
     fun findBy(
-        lotId: ForeignKey,
+        lotId: SecondaryKey,
         meteringMode: MeteringMode,
         effectiveDate: LocalDate,
     ): List<MeteringRule>
 
     fun existsBy(
-        lotId: ForeignKey,
+        lotId: SecondaryKey,
         effectiveDate: LocalDate,
     ): Boolean
 

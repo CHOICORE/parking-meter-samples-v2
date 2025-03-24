@@ -1,8 +1,8 @@
 package me.choicore.samples.meter.infrastructure.persistence.exposed
 
 import me.choicore.samples.context.entity.AuditorContext
-import me.choicore.samples.context.entity.ForeignKey
 import me.choicore.samples.context.entity.PrimaryKey
+import me.choicore.samples.context.entity.SecondaryKey
 import me.choicore.samples.meter.domain.MeteringMode
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringMode.REPEAT
@@ -87,7 +87,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
 
     @Transactional(readOnly = true)
     override fun existsBy(
-        lotId: ForeignKey,
+        lotId: SecondaryKey,
         effectiveDate: LocalDate,
     ): Boolean =
         MeteringRuleTable.exists {
@@ -107,7 +107,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
 
     @Transactional(readOnly = true)
     override fun getAvailableTimeBasedMeteringStrategy(
-        lotId: ForeignKey,
+        lotId: SecondaryKey,
         measureOn: LocalDate,
     ): MeteringStrategy? {
         val once: Query =
@@ -145,7 +145,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
 
     @Transactional(readOnly = true)
     override fun findBy(
-        lotId: ForeignKey,
+        lotId: SecondaryKey,
         meteringMode: MeteringMode,
         effectiveDate: LocalDate,
     ): List<MeteringRule> =
@@ -189,7 +189,7 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
         val meteringRule =
             MeteringRule(
                 id = PrimaryKey(this[MeteringRuleTable.id].value),
-                lotId = ForeignKey(this[MeteringRuleTable.lotId]),
+                lotId = SecondaryKey(this[MeteringRuleTable.lotId]),
                 meteringStrategy = timelineMeteringStrategy,
                 registeredAt = this[MeteringRuleTable.registeredAt],
                 registeredBy = this[MeteringRuleTable.registeredBy],

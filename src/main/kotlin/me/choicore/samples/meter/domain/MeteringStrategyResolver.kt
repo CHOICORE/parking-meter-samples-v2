@@ -1,6 +1,6 @@
 package me.choicore.samples.meter.domain
 
-import me.choicore.samples.context.entity.ForeignKey
+import me.choicore.samples.context.entity.SecondaryKey
 import me.choicore.samples.meter.domain.MeteringMode.ONCE
 import me.choicore.samples.meter.domain.MeteringStrategy.AbstractMeteringStrategy
 import org.springframework.stereotype.Component
@@ -13,7 +13,7 @@ class MeteringStrategyResolver(
     fun resolve(measurand: Measurand): MeteringStrategy {
         val meteringStrategy: MeteringStrategy? =
             this.meteringStrategyProvider.getAvailableTimeBasedMeteringStrategy(
-                lotId = ForeignKey(measurand.lotId),
+                lotId = SecondaryKey(measurand.lotId),
                 measureOn = measurand.measureOn,
             )
 

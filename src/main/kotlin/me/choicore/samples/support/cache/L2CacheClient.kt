@@ -9,7 +9,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 import org.springframework.stereotype.Service
 import java.time.Duration
 
-// L2 캐시 클라이언트 (Redis 기반) - 인터페이스 구현
 @Service
 class L2CacheClient(
     redisConnectionFactory: RedisConnectionFactory,
@@ -19,11 +18,12 @@ class L2CacheClient(
     private val objectMapper: ObjectMapper = objectMapper.copy().apply { deactivateDefaultTyping() }
 
     init {
+        val stringRedisSerializer = StringRedisSerializer()
         val genericJackson2JsonRedisSerializer = GenericJackson2JsonRedisSerializer(this.objectMapper)
         this.redisTemplate.connectionFactory = redisConnectionFactory
-        this.redisTemplate.keySerializer = StringRedisSerializer()
+        this.redisTemplate.keySerializer = stringRedisSerializer
         this.redisTemplate.valueSerializer = genericJackson2JsonRedisSerializer
-        this.redisTemplate.hashKeySerializer = StringRedisSerializer()
+        this.redisTemplate.hashKeySerializer = stringRedisSerializer
         this.redisTemplate.hashValueSerializer = genericJackson2JsonRedisSerializer
         this.redisTemplate.afterPropertiesSet()
     }
@@ -58,11 +58,15 @@ class L2CacheClient(
     override fun evict(
         namespace: Namespace,
         key: CacheKey,
-    ): Boolean = redisTemplate.delete(formatKey(namespace, key))
+    ): Boolean {
+        val deleted: Boolean = redisTemplate.delete(formatKey(namespace, key))
+
+        return deleted
+    }
 
     override fun evict(namespace: Namespace): Boolean {
         val pattern = "${namespace.value}:*"
-        val keys = redisTemplate.keys(pattern)
+        val keys: MutableSet<String> = redisTemplate.keys(pattern)
         if (keys.isNotEmpty()) {
             return redisTemplate.delete(keys) > 0
         }

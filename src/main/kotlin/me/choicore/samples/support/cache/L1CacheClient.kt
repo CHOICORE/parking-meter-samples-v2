@@ -2,6 +2,7 @@ package me.choicore.samples.support.cache
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.Expiry
 import me.choicore.samples.core.TypeReference
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -9,19 +10,12 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class L1CacheClient : CacheClient {
-    private val caches: ConcurrentHashMap<Namespace, Cache<CacheKey, Any>> = ConcurrentHashMap()
+    private val caches: ConcurrentHashMap<Namespace, Cache<CacheKey, ExpiryAware<Any>>> = ConcurrentHashMap()
 
-    private fun register(
-        namespace: Namespace,
-        duration: Duration,
-    ): Cache<CacheKey, Any> =
-        caches.computeIfAbsent(namespace) {
-            Caffeine
-                .newBuilder()
-                .expireAfterWrite(duration)
-                .maximumSize(10000)
-                .build()
-        }
+    private data class ExpiryAware<V : Any>(
+        val value: V,
+        val timeout: Duration,
+    )
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> get(
@@ -29,14 +23,9 @@ class L1CacheClient : CacheClient {
         key: CacheKey,
         clazz: Class<T>,
     ): T? {
-        val cache = caches[namespace] ?: return null
-        val value = cache.getIfPresent(key) ?: return null
-
-        return if (clazz.isInstance(value)) {
-            value as T
-        } else {
-            null
-        }
+        val cache: Cache<CacheKey, ExpiryAware<Any>> = caches[namespace] ?: return null
+        val entry: ExpiryAware<Any> = cache.getIfPresent(key) ?: return null
+        return entry.value as T
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -45,14 +34,10 @@ class L1CacheClient : CacheClient {
         key: CacheKey,
         typeReference: TypeReference<T>,
     ): T? {
-        val cache = caches[namespace] ?: return null
-        val value = cache.getIfPresent(key) ?: return null
+        val cache: Cache<CacheKey, ExpiryAware<Any>> = caches[namespace] ?: return null
+        val entry: ExpiryAware<Any> = cache.getIfPresent(key) ?: return null
 
-        return try {
-            value as T
-        } catch (e: ClassCastException) {
-            null
-        }
+        return entry.value as T
     }
 
     override fun <T : Any> put(
@@ -61,22 +46,61 @@ class L1CacheClient : CacheClient {
         value: T,
         duration: Duration,
     ) {
-        val cache = register(namespace, duration)
-        cache.put(key, value)
+        val cache: Cache<CacheKey, ExpiryAware<Any>> = register(namespace)
+        cache.put(key, ExpiryAware(value, duration))
     }
 
     override fun evict(
         namespace: Namespace,
         key: CacheKey,
     ): Boolean {
-        val cache = caches[namespace] ?: return false
-        cache.invalidate(key)
-        return true
+        val cache: Cache<CacheKey, ExpiryAware<Any>> = caches[namespace] ?: return false
+
+        return try {
+            cache.invalidate(key)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     override fun evict(namespace: Namespace): Boolean {
-        val cache = caches[namespace] ?: return false
-        cache.invalidateAll()
-        return true
+        val cache: Cache<CacheKey, ExpiryAware<Any>> = caches[namespace] ?: return false
+        return try {
+            cache.invalidateAll()
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
+
+    private fun register(namespace: Namespace): Cache<CacheKey, ExpiryAware<Any>> =
+        caches.computeIfAbsent(namespace) {
+            Caffeine
+                .newBuilder()
+                .expireAfter(
+                    object : Expiry<CacheKey, ExpiryAware<Any>> {
+                        override fun expireAfterCreate(
+                            key: CacheKey,
+                            value: ExpiryAware<Any>,
+                            currentTime: Long,
+                        ): Long = value.timeout.toNanos()
+
+                        override fun expireAfterUpdate(
+                            key: CacheKey,
+                            value: ExpiryAware<Any>,
+                            currentTime: Long,
+                            currentDuration: Long,
+                        ): Long = currentDuration
+
+                        override fun expireAfterRead(
+                            key: CacheKey,
+                            value: ExpiryAware<Any>,
+                            currentTime: Long,
+                            currentDuration: Long,
+                        ): Long = currentDuration
+                    },
+                ).maximumSize(10000)
+                .build()
+        }
 }

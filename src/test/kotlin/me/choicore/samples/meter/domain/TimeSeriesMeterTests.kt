@@ -15,9 +15,15 @@ class TimeSeriesMeterTests(
         val metrics =
             timeSeriesMeter.measure(
                 lotId = 1L,
-                startDateTimeInclusive = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+                startDateTimeInclusive = LocalDateTime.of(2025, 3, 1, 0, 0, 0),
                 endDateTimeExclusive = LocalDateTime.now(),
             )
+
+        timeSeriesMeter.measure(
+            lotId = 1L,
+            startDateTimeInclusive = LocalDateTime.of(2025, 3, 1, 15, 0, 0),
+            endDateTimeExclusive = LocalDateTime.now(),
+        )
 
         val totalUsage = metrics.sumOf { it.cost }
     }

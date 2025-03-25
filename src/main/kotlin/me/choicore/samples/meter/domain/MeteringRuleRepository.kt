@@ -4,7 +4,7 @@ import me.choicore.samples.context.entity.PrimaryKey
 import me.choicore.samples.context.entity.SecondaryKey
 import java.time.LocalDate
 
-interface MeteringRuleRepository : MeteringStrategyProvider {
+interface MeteringRuleRepository {
     fun save(meteringRule: MeteringRule): MeteringRule
 
     fun findBy(
@@ -19,4 +19,9 @@ interface MeteringRuleRepository : MeteringStrategyProvider {
     ): Boolean
 
     fun deleteById(id: PrimaryKey)
+
+    fun getAvailableTimeBasedMeteringRule(
+        lotId: SecondaryKey,
+        measureOn: LocalDate,
+    ): MeteringRule?
 }

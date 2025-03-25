@@ -31,6 +31,6 @@ fun <T : Table> T.exists(where: SqlExpressionBuilder.() -> Op<Boolean>): Boolean
  * @return 쿼리 결과가 존재하면 true, 아니면 false
  */
 internal fun Query.exists(): Boolean {
-    val resultRow: ResultRow = Dual.select(exists(this)).first()
+    val resultRow: ResultRow = Dual.select(exists(this)).single()
     return resultRow[exists(this)]
 }

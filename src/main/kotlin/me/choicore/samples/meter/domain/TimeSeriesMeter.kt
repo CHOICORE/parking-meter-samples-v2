@@ -9,8 +9,10 @@ import java.util.Collections
 
 @Service
 class TimeSeriesMeter(
-    private val meteringStrategyResolver: MeteringStrategyResolver,
+    private val meteringStrategyResolver: MeteringStrategySelector,
 ) : Meter {
+    override fun measure(measurand: Measurand): List<Metric> = meteringStrategyResolver.select(measurand).measure(measurand)
+
     fun measure(
         lotId: Long,
         startDateTimeInclusive: LocalDateTime,
@@ -78,6 +80,4 @@ class TimeSeriesMeter(
 
         return Collections.unmodifiableList(metrics)
     }
-
-    override fun measure(measurand: Measurand): List<Metric> = meteringStrategyResolver.resolve(measurand).measure(measurand)
 }

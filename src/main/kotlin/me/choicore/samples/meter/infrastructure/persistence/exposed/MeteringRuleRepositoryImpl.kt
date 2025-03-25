@@ -11,6 +11,7 @@ import me.choicore.samples.meter.domain.MeteringRuleRepository
 import me.choicore.samples.meter.domain.MeteringStrategy
 import me.choicore.samples.meter.domain.MeteringStrategy.DayOfWeekBasedMeteringStrategy
 import me.choicore.samples.meter.domain.MeteringStrategy.SpecifiedDateBasedMeteringStrategy
+import me.choicore.samples.meter.domain.MeteringStrategyProvider
 import me.choicore.samples.meter.infrastructure.persistence.exposed.table.MeteringRuleTable
 import me.choicore.samples.support.exposed.SELECT_ONE
 import me.choicore.samples.support.exposed.exists
@@ -28,7 +29,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Repository
-class MeteringRuleRepositoryImpl : MeteringRuleRepository {
+class MeteringRuleRepositoryImpl :
+    MeteringRuleRepository,
+    MeteringStrategyProvider {
     @Transactional
     override fun save(meteringRule: MeteringRule): MeteringRule =
         when (val strategy: MeteringStrategy = meteringRule.meteringStrategy) {
@@ -106,42 +109,10 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
     }
 
     @Transactional(readOnly = true)
-    override fun getAvailableTimeBasedMeteringStrategy(
+    override fun getAvailableTimeBasedMeteringRule(
         lotId: SecondaryKey,
         measureOn: LocalDate,
-    ): MeteringStrategy? {
-        val once: Query =
-            MeteringRuleTable
-                .selectAll()
-                .where {
-                    (MeteringRuleTable.lotId eq lotId.value) and
-                        (MeteringRuleTable.effectiveDate eq measureOn) and
-                        (MeteringRuleTable.meteringMode eq ONCE) and
-                        (MeteringRuleTable.deletedAt.isNull())
-                }
-
-        val repeat: Query =
-            MeteringRuleTable
-                .selectAll()
-                .where {
-                    (MeteringRuleTable.lotId eq lotId.value) and
-                        (MeteringRuleTable.effectiveDate lessEq measureOn) and
-                        (MeteringRuleTable.meteringMode eq REPEAT) and
-                        notExists(
-                            MeteringRuleTable
-                                .select(SELECT_ONE)
-                                .where {
-                                    (MeteringRuleTable.lotId eq lotId.value) and
-                                        (MeteringRuleTable.effectiveDate eq measureOn) and
-                                        (MeteringRuleTable.meteringMode eq ONCE) and
-                                        (MeteringRuleTable.deletedAt.isNull())
-                                },
-                        )
-                }.orderBy(MeteringRuleTable.effectiveDate, DESC)
-                .limit(1)
-
-        return once.unionAll(repeat).singleOrNull()?.convert()
-    }
+    ): MeteringRule? = findAvailableTimeBasedMeteringRule(lotId, measureOn)
 
     @Transactional(readOnly = true)
     override fun findBy(
@@ -199,5 +170,48 @@ class MeteringRuleRepositoryImpl : MeteringRuleRepository {
         meteringRule.deletedAt = this[MeteringRuleTable.deletedAt]
         meteringRule.deletedBy = this[MeteringRuleTable.deletedBy]
         return meteringRule
+    }
+
+    @Transactional(readOnly = true)
+    override fun getAvailableTimeBasedMeteringStrategy(
+        lotId: SecondaryKey,
+        measureOn: LocalDate,
+    ): MeteringStrategy? = findAvailableTimeBasedMeteringRule(lotId, measureOn)
+
+    private fun findAvailableTimeBasedMeteringRule(
+        lotId: SecondaryKey,
+        measureOn: LocalDate,
+    ): MeteringRule? {
+        val once: Query =
+            MeteringRuleTable
+                .selectAll()
+                .where {
+                    (MeteringRuleTable.lotId eq lotId.value) and
+                        (MeteringRuleTable.effectiveDate eq measureOn) and
+                        (MeteringRuleTable.meteringMode eq ONCE) and
+                        (MeteringRuleTable.deletedAt.isNull())
+                }
+
+        val repeat: Query =
+            MeteringRuleTable
+                .selectAll()
+                .where {
+                    (MeteringRuleTable.lotId eq lotId.value) and
+                        (MeteringRuleTable.effectiveDate lessEq measureOn) and
+                        (MeteringRuleTable.meteringMode eq REPEAT) and
+                        notExists(
+                            MeteringRuleTable
+                                .select(SELECT_ONE)
+                                .where {
+                                    (MeteringRuleTable.lotId eq lotId.value) and
+                                        (MeteringRuleTable.effectiveDate eq measureOn) and
+                                        (MeteringRuleTable.meteringMode eq ONCE) and
+                                        (MeteringRuleTable.deletedAt.isNull())
+                                },
+                        )
+                }.orderBy(MeteringRuleTable.effectiveDate, DESC)
+                .limit(1)
+
+        return once.unionAll(repeat).singleOrNull()?.convert()
     }
 }
